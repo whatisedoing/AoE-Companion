@@ -100,6 +100,7 @@
   .row { position:relative; display:grid; grid-template-columns:62px 1fr auto; gap:12px; align-items:start; padding:12px; margin-bottom:8px; border-radius:12px; border:1px solid var(--line); background:linear-gradient(180deg, var(--card2), var(--card)); overflow:hidden; scroll-margin-top:30vh; }
   .row .pop { font:700 17px var(--head); color:var(--gold-soft); text-align:center; line-height:1.1; padding-top:2px; }
   .row .pop small { display:block; font:600 9.5px var(--body); color:var(--muted); letter-spacing:.06em; margin-top:3px; }
+  .row .right { display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
   .row .secs { color:var(--muted); font-size:13px; text-align:right; padding-top:3px; }
   .row .bar { position:absolute; left:0; bottom:0; height:4px; width:0; background:var(--gold); }
   .row.done { opacity:.4; }
@@ -126,7 +127,7 @@
   .opt.dim { opacity:.6; }
   .or { text-align:center; font:700 12px var(--head); color:var(--muted); letter-spacing:.1em; }
 
-  .row.mile { grid-template-columns:1fr; background:linear-gradient(90deg, rgba(224,176,74,.16), rgba(224,176,74,.04)); border-style:dashed; align-items:center; }
+  .row.mile { grid-template-columns:1fr auto; background:linear-gradient(90deg, rgba(224,176,74,.16), rgba(224,176,74,.04)); border-style:dashed; align-items:center; }
   .row.mile .ttl { font:700 16px var(--head); color:var(--gold-soft); display:flex; gap:10px; align-items:center; }
   .row.mile .ttl::before { content:attr(data-badge); font:700 12px var(--head); background:var(--gold); color:#3b2410; border-radius:50%; width:24px; height:24px; display:grid; place-items:center; }
   .compact .row .note, .compact .row .then { display:none; } .compact .row { padding:8px 12px; margin-bottom:5px; } .compact .it .ttl { font-size:16px; } .compact .it .pre { font-size:12px; }
@@ -148,6 +149,36 @@
   .hint { color:var(--muted); font-size:13.5px; margin-top:6px; }
   button.danger { color:#ff9c8a; border-color:#7a3a30; }
   .hbtn { position:absolute; right:16px; top:calc(20px + env(safe-area-inset-top)); background:rgba(0,0,0,.25); border:1px solid var(--gold-soft); color:var(--gold-soft); border-radius:999px; padding:6px 16px; font:700 14px var(--body); cursor:pointer; }
+  .kebab { display:none; width:40px; height:40px; border-radius:50%; border:1px solid var(--gold); background:rgba(0,0,0,.3); color:var(--gold-soft); font:700 22px/1 var(--body); cursor:pointer; padding:0; }
+  .row.sel { outline:2px solid rgba(224,176,74,.55); outline-offset:-2px; }
+  .row.sel .kebab { display:block; }
+  .sheetbg { position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:20; display:flex; align-items:flex-end; }
+  .sheet { width:100%; max-width:560px; margin:0 auto; background:var(--card); border-top:3px solid var(--gold); border-radius:18px 18px 0 0; padding:14px 14px calc(14px + env(safe-area-inset-bottom)); }
+  .sheettitle { font:700 16px var(--head); color:var(--gold-soft); text-align:center; margin-bottom:10px; }
+  .sheetbtn { display:block; width:100%; text-align:left; padding:15px 14px; margin-bottom:8px; border-radius:12px; border:1px solid var(--line); background:var(--card2); color:var(--text); font:600 17px var(--body); cursor:pointer; }
+  .sheetbtn.cancel { text-align:center; color:var(--muted); background:transparent; }
+  .linkbtn { background:none; border:0; color:var(--gold-soft); font:600 15px var(--body); padding:10px 2px 4px; cursor:pointer; text-align:left; }
+  .tools2 { justify-content:flex-end; margin-bottom:6px; } .tools2 > * { flex:0 0 auto; padding-left:12px; }
+  button.tap { width:100%; text-align:left; background:none; border:0; color:var(--text); font:inherit; cursor:pointer; padding:0; display:flex; align-items:center; gap:10px; }
+  .ecard .ehead.tap { padding:2px 0; }
+  .ecard:not(.open) { padding:12px 14px; }
+  .chev { color:var(--gold); width:14px; flex:0 0 14px; }
+  .esum { flex:1; min-width:0; font-weight:700; font-size:16px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .esum.mile { font-family:var(--head); color:var(--gold-soft); }
+  .etime { color:var(--muted); font-size:13px; flex:0 0 auto; }
+  .ebtnrow { display:flex; justify-content:flex-end; margin:6px 0 2px; }
+  .tasks { margin-top:6px; }
+  .isum { width:100%; display:flex; align-items:center; gap:8px; background:none; border:0; color:var(--text); font:inherit; text-align:left; cursor:pointer; padding:0; }
+  .isum .itxt { flex:1; min-width:0; display:block; }
+  .isum .itxt b { display:block; font-size:16px; }
+  .isum .itxt small { display:block; color:var(--muted); font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pill { font:600 10px var(--body); letter-spacing:.05em; text-transform:uppercase; color:var(--gold-soft); border:1px solid var(--line); border-radius:999px; padding:1px 6px; }
+  .eitem { margin-top:8px; padding:10px 12px; }
+  .eitem.open { padding-bottom:12px; }
+  .ehead2 { display:flex; justify-content:space-between; align-items:center; }
+  .ehead2 b { font:700 14px var(--head); color:var(--gold-soft); }
+  @keyframes flash { 0%,100% { box-shadow:none } 30% { box-shadow:0 0 0 3px var(--gold) } }
+  .ecard.flash { animation:flash 1.6s ease 1; }
   .dock { position:fixed; left:0; right:0; bottom:0; padding:10px 14px calc(10px + env(safe-area-inset-bottom)); background:rgba(31,24,20,.96); border-top:2px solid var(--gold); display:flex; gap:10px; align-items:center; justify-content:center; backdrop-filter:blur(6px); z-index:5; }
   .dock .time { font:700 24px var(--head); min-width:78px; text-align:center; }
   .dock button { border:1px solid var(--line); background:var(--card2); color:var(--text); border-radius:10px; height:46px; min-width:46px; padding:0 14px; font:700 16px var(--body); cursor:pointer; }
@@ -231,6 +262,19 @@ const CIV_TAGS = {
                    { choice:true, t:"Either", opts:[{t,d,good,why}] }                */
 const I = (t, d, r, o = {}) => ({ t, d, r, ...o });
 const M = (m, age) => ({ m, age });
+const GRP = (from, to, ...items) => ({ g: from === to ? String(from) : from + "–" + to, from, to, items });
+const WAIT = (g, secs, label, ...items) => ({ g, secs, label, items });
+const NOW = (g, ...items) => ({ g, secs: 0, items });
+const OPENG = (g, ...items) => ({ g, open: true, items });
+const LURE2 = () => I("Lure 2nd Boar", "Send one of your Villagers collecting from Boar to lure your 2nd Boar", "food", { side: true });
+const HEAD = () => [
+  M("Dark Age", "dark"),
+  { g: "3", secs: 0, label: "START", items: [
+    I("Queue up Villagers", "Queue up as many Villagers as you can in your Town Center", "other"),
+    I("2 Houses", "Two Villagers build one, one Villager builds the other", "other", { then: "When finished, send them to Sheep" })] },
+  GRP(4, 6, I("Sheep", "Send your new Villagers to Sheep", "food")),
+  GRP(7, 7, I("Lumber Camp", "Send your new Villager to build a Lumber Camp", "wood", { then: "When finished, send them to Wood" }))
+];
 const SEEDS = [{
   title: "18 Pop Scouts into Cavalry Archers", strategy: "Scouts into Cav Archers",
   overview: "Open with safe scouts in Feudal and wall in, then switch to Cavalry Archers in Castle. Suits Huns, Mongols, Magyars, Japanese and Tatars.",
@@ -250,8 +294,8 @@ const SEEDS = [{
       I("Sheep / Boar", "Send your new Villagers to Sheep or Boar", "food"),
       I("Lure 2nd Boar", "Send one of your Villagers collecting from Boar to lure your 2nd Boar", "food", { side: true })] },
     { g: "17–18", from: 17, to: 18, items: [I("Wood", "Send your new Villagers to collect Wood", "wood")] },
-    { g: "18", secs: 25, label: "LOOM", items: [I("Loom", "Research Loom in your Town Center", "other", { pre: "Optional" })] },
     { g: "18", secs: 130, label: "FEUDAL RESEARCH", items: [
+      I("Loom", "Research Loom in your Town Center", "other", { pre: "Optional" }),
       I("Queue Feudal Age", "Queue Feudal Age in your Town Center", "other"),
       I("Lumber Camp", "Send 5 villagers to build a Lumber Camp", "wood", { pre: "Take 5 villagers from Hunt", then: "When finished, send them to Wood" }),
       I("Berries", "Send 5 Villagers to Berries", "food", { pre: "Take 5 villagers from Hunt" }),
@@ -333,6 +377,154 @@ const SEEDS = [{
       I("Heavy Plow", "Research Heavy Plow at your Mill", "food"),
       I("Fletching", "Research Fletching in your Blacksmith", "other")] }
   ]
+},
+{
+  title: "Scout Rush", strategy: "Scout Rush",
+  overview: "Click Feudal at 20 villagers and send scouts at the enemy's economy while you farm up behind them.",
+  steps: [...HEAD(),
+    GRP(8, 9, I("Wood", "Send your new Villagers to collect Wood", "wood")),
+    GRP(10, 10, I("Lure Boar", "Send your new Villager to lure the nearest Boar", "food")),
+    GRP(11, 11, I("Sheep / Boar", "Send your new Villager to Sheep or Boar", "food")),
+    GRP(12, 12, I("2 Houses", "Send your new Villager to build two houses near your Berries", "other", { then: "When finished, send them to Berries" })),
+    GRP(13, 13, I("Mill", "Send your new Villager to build a Mill next to your Berries", "food", { then: "When finished, send them to Berries" })),
+    GRP(14, 14, I("Berries", "Send your new Villager to Berries", "food"), LURE2()),
+    GRP(15, 15, I("Berries", "Send your new Villager to Berries", "food")),
+    GRP(16, 17, I("Sheep / Boar", "Send your new Villager to Sheep or Boar", "food")),
+    GRP(18, 18, I("Lumber Camp", "Send your new Villager to build a Lumber Camp", "wood", { then: "When finished, send them to Wood" })),
+    GRP(19, 19, I("Wood", "Send your new Villagers to collect Wood", "wood")),
+    GRP(20, 20, I("Wood", "Send your new Villager to collect Wood", "wood")),
+    WAIT("20", 130, "FEUDAL RESEARCH",
+      I("Loom", "Research Loom in your Town Center", "other"),
+      I("Feudal Age", "Advance to the Feudal Age in your Town Center", "other"),
+      I("Barracks", "Build a Barracks", "other"),
+      I("Wood", "Send your Villagers to collect Wood", "wood", { pre: "Take 4 villagers from Sheep to..." })),
+    M("Feudal Age", "feudal"),
+    NOW("20",
+      I("Stable", "Build a Stable", "other", { then: "When finished, train 2-3 scouts and send them to your opponent's base" }),
+      I("Farms", "Build new Farms around your Town Center or Mill", "food", { pre: "Take villagers from Sheep as they get depleted to..." }),
+      I("Double-Bit Axe", "Research Double-Bit Axe in a Lumber Camp", "wood"),
+      I("Horse Collar", "Research in your Mill", "food")),
+    GRP(21, 28, I("Farms", "Send your new Villagers to build Farms next to your Town Center or Mills", "food"))
+  ]
+},
+{
+  title: "Archer Rush", strategy: "Archer Rush",
+  overview: "Click Feudal at 21 villagers, build two Archery Ranges, and keep archers coming while your economy grows.",
+  steps: [...HEAD(),
+    GRP(8, 10, I("Wood", "Send your new Villagers to collect Wood", "wood")),
+    GRP(11, 11, I("Lure Boar", "Send your new Villager to lure the nearest Boar", "food")),
+    GRP(12, 12, I("2 Houses", "Send your new Villager to build two houses near your Berries", "other", { then: "When finished, send them to Berries" })),
+    GRP(13, 13, I("Mill", "Send your new Villager to build a Mill next to your Berries", "food", { then: "When finished, send them to Berries" })),
+    GRP(14, 14, I("Berries", "Send your new Villager to Berries", "food")),
+    GRP(15, 15, I("Berries", "Send your new Villager to Berries", "food"), LURE2()),
+    GRP(16, 17, I("Sheep / Boar", "Send your new Villager to Sheep or Boar", "food")),
+    GRP(18, 18, I("Lumber Camp", "Send your new Villager to build a Lumber Camp", "wood", { then: "When finished, send them to Wood" })),
+    GRP(19, 20, I("Wood", "Send your new Villagers to collect Wood", "wood")),
+    GRP(21, 21, I("Wood", "Send your new Villager to collect Wood", "wood")),
+    WAIT("21", 130, "FEUDAL RESEARCH",
+      I("Loom", "Research Loom in your Town Center", "other"),
+      I("Feudal Age", "Advance to the Feudal Age in your Town Center", "other"),
+      I("Wood", "Send your Villagers to collect Wood. You should have 5 Villagers on each Lumber Camp", "wood", { pre: "Take 2 villagers from Sheep to..." }),
+      I("(Gold) Mining Camp", "Send your Villagers to build a Mining Camp next to Gold", "gold", { pre: "Take 3 villagers from Sheep to...", then: "When finished, send them to Gold" }),
+      I("Barracks", "Build a Barracks", "other", { pre: "Around 60% of the way up to Feudal, take a Villager from Food to..." })),
+    M("Feudal Age", "feudal"),
+    NOW("21",
+      I("Double-Bit Axe", "Research Double-Bit Axe in a Lumber Camp", "wood"),
+      I("(2x) Archery Range", "Build two Archery Ranges", "other", { then: "When finished, train 6-8 Archers" }),
+      I("Blacksmith", "Build a Blacksmith", "other"),
+      I("Fletching", "Research Fletching on your Blacksmith", "other", { pre: "Before your archers start attacking..." })),
+    GRP(22, 25,
+      I("Gold", "Send your new Villagers to mine Gold", "gold"),
+      I("Farms", "Build new Farms around your Town Center or Mill", "food", { pre: "Take villagers from Sheep as they get depleted to..." })),
+    GRP(26, 33,
+      I("Straggler Trees and Farms", "Send your new Villagers to take Straggler Trees and build Farms as enough Wood becomes available", "wood"),
+      I("Wheelbarrow", "Research Wheelbarrow in your Town Center", "other"),
+      I("Farms", "Build new Farms around your Mill", "food", { pre: "Take villagers from Berries as they get depleted to..." })),
+    GRP(34, 34, I("Wood", "Send your new Villager to collect Wood", "wood")),
+    GRP(35, 35, I("Gold", "Send your new Villager to mine Gold", "gold")),
+    WAIT("35", 160, "CASTLE RESEARCH",
+      I("Castle Age", "Advance to the Castle Age in your Town Center", "other"),
+      I("Horse Collar", "Research in your Mill", "food"),
+      I("Gold Mining", "Research Gold Mining at your Mining Camp", "gold")),
+    M("Castle Age", "castle")
+  ]
+},
+{
+  title: "Fast Castle Knights", strategy: "Fast Castle",
+  overview: "Boom to 27 villagers, advance to Feudal and then Castle Age, and train Knights from two Stables.",
+  steps: [...HEAD(),
+    GRP(8, 10, I("Wood", "Send your new Villagers to collect Wood", "wood")),
+    GRP(11, 11, I("Lure Boar", "Send your new Villager to lure the nearest Boar", "food")),
+    GRP(12, 12, I("2 Houses", "Send your new Villager to build two houses near your Berries", "other", { then: "When finished, send them to Berries" })),
+    GRP(13, 13, I("Mill", "Send your new Villager to build a Mill next to your Berries", "food", { then: "When finished, send them to Berries" })),
+    GRP(14, 14, I("Berries", "Send your new Villager to Berries", "food"), I("Lure Boar", "Send your new Villager to lure the nearest Boar", "food", { side: true })),
+    GRP(15, 16, I("Berries", "Send your new Villager to Berries", "food")),
+    GRP(17, 18, I("Farms", "Send your new Villagers to build Farms next to your Town Center or Mills", "food")),
+    GRP(19, 19, I("Lumber Camp", "Send your new Villager to build a Lumber Camp", "wood", { then: "When finished, send them to Wood" })),
+    GRP(20, 21, I("Wood", "Send your new Villager to collect Wood", "wood")),
+    GRP(22, 22, I("House", "Send your new Villager to build a house", "other", { then: "When finished, send them to Wood" })),
+    GRP(23, 24, I("Wood", "Send your new Villager to collect Wood", "wood")),
+    GRP(25, 25, I("(Gold) Mining Camp", "Send your new Villager to build a Mining Camp next to your Gold", "gold", { then: "When finished, send them to Gold" })),
+    GRP(26, 26, I("Gold", "Send your new Villager to mine Gold", "gold")),
+    GRP(27, 27, I("Gold", "Send your new Villager to mine Gold", "gold")),
+    WAIT("27", 130, "FEUDAL RESEARCH",
+      I("Queue Feudal Age", "Queue Feudal Age in your Town Center", "other"),
+      I("Barracks", "Build a Barracks", "other"),
+      I("Farms", "Build new Farms around your Town Center or Mill", "food", { pre: "Take villagers from Sheep as they get depleted to..." })),
+    M("Feudal Age", "feudal"),
+    NOW("27",
+      I("Stable", "Build a Stable", "other", { pre: "Take 1 villager from Wood to...", then: "When finished, send them back to Wood" }),
+      I("Blacksmith", "Build a Blacksmith", "other", { pre: "Take 1 villager from Wood to...", then: "When finished, send them back to Wood" })),
+    GRP(28, 28, I("Gold", "Send your new Villager to mine Gold", "gold")),
+    GRP(29, 29, I("Gold", "Send your new Villager to mine Gold", "gold")),
+    WAIT("29", 160, "CASTLE RESEARCH",
+      I("Castle Age", "Advance to the Castle Age in your Town Center", "other"),
+      I("Stable", "Build a Stable", "other"),
+      I("Farms", "Build new Farms around your Town Center", "food", { pre: "Take 2 villagers from Berries to..." })),
+    M("Castle Age", "castle"),
+    OPENG("29", I("Knights", "Start training Knights from both Stables", "other"))
+  ]
+},
+{
+  title: "Men-at-Arms Rush into Archers", strategy: "Men-at-Arms Rush",
+  overview: "Build a Barracks early for Men-at-Arms pressure, then add Archery Ranges and archers behind it.",
+  steps: [...HEAD(),
+    GRP(8, 10, I("Wood", "Send your new Villagers to collect Wood", "wood")),
+    GRP(11, 11, I("Lure Boar", "Send your new Villager to lure the nearest Boar", "food")),
+    GRP(12, 12, I("2 Houses", "Send your new Villager to build two houses near your Berries", "other", { then: "When finished, send them to Berries" })),
+    GRP(13, 13, I("Mill", "Send your new Villager to build a Mill next to your Berries", "food", { then: "When finished, send them to Berries" })),
+    GRP(14, 14, I("Berries", "Send your new Villager to Berries", "food")),
+    GRP(15, 15, I("Berries", "Send your new Villager to Berries", "food"), LURE2()),
+    GRP(16, 16, I("Berries", "Send your new Villager to Berries", "food")),
+    GRP(17, 18, I("Sheep / Boar", "Send your new Villagers to Sheep or Boar", "food")),
+    GRP(19, 19, I("Barracks", "Take your new Villager to build a Barracks", "other", { then: "When finished, train 3 Militia and send the Villager to build a Farm" })),
+    GRP(20, 20, I("(Gold) Mining Camp", "Send your new Villager to build a Mining Camp next to your Gold", "gold", { then: "When finished, send them to Gold" })),
+    GRP(21, 21, I("Gold", "Send your new Villager to mine Gold", "gold")),
+    WAIT("21", 130, "FEUDAL RESEARCH",
+      I("Loom", "Research Loom in your Town Center", "other"),
+      I("Feudal Age", "Advance to the Feudal Age in your Town Center", "other"),
+      I("Lumber Camp", "Send your Villagers to build your 2nd Lumber Camp", "wood", { pre: "Take 4 Villagers from Sheep to..." }),
+      I("Farm", "Build a Farm next to your Town Center", "food", { pre: "Take 1 Villager from Sheep to..." })),
+    M("Feudal Age", "feudal"),
+    NOW("21",
+      I("Double-Bit Axe", "Research Double-Bit Axe in a Lumber Camp", "wood"),
+      I("Men-at-Arms", "Research Men-at-Arms at your Barracks", "other"),
+      I("Wood", "Send your Villagers to collect Wood", "wood", { pre: "Take 4 Villagers from Sheep to..." })),
+    GRP(22, 23,
+      I("Farms", "Send your new Villagers to build Farms next to your Town Center or Mills", "food"),
+      I("Farms", "Build new Farms around your Town Center or Mill", "food", { pre: "Take villagers from Sheep as they get depleted to..." })),
+    GRP(24, 24,
+      I("Gold", "Send your new Villager to mine Gold", "gold"),
+      I("(2x) Archery Range", "Build two Archery Ranges", "other"),
+      I("Blacksmith", "Build a Blacksmith", "other"),
+      I("Archers", "Train 6 Archers in your Ranges", "other")),
+    GRP(25, 29,
+      I("Gold", "Send your new Villagers to mine Gold", "gold"),
+      I("Fletching", "Research Fletching in your Blacksmith", "other")),
+    GRP(30, 38,
+      I("Farms", "Send your new Villagers to build Farms next to your Town Center or Mills", "food"),
+      I("Farms", "Build new Farms around your Mill", "food", { pre: "Take villagers from Berries as they get depleted to..." }))
+  ]
 }];
 
 /* ---------- screens ---------- */
@@ -374,6 +566,27 @@ async function screenHome() {
   count.textContent = n ? n + " saved" : "Load your starter builds";
 }
 
+const same = (a, b) => {
+  if (a === b) return true;
+  if (typeof a !== "object" || typeof b !== "object" || !a || !b) return false;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  const ka = Object.keys(a), kb = Object.keys(b);
+  return ka.length === kb.length && ka.every(k => same(a[k], b[k]));
+};
+// starter builds you haven't edited yourself are kept up to date with the latest version
+async function syncSeeds(rows) {
+  let changed = false;
+  for (const r of rows) {
+    if (r.source !== "seed") continue;
+    const s = SEEDS.find(x => x.title === r.title);
+    if (s && (!same(s.steps, r.steps) || s.overview !== r.overview)) {
+      await sb.from("aoe_build_orders").update({ steps: s.steps, overview: s.overview, strategy: s.strategy }).eq("id", r.id);
+      changed = true;
+    }
+  }
+  return changed;
+}
+
 async function addMissingSeeds() {
   const { data, error } = await sb.from("aoe_build_orders").select("title");
   if (error) return error.message;
@@ -408,6 +621,7 @@ async function screenBuilds() {
     await addMissingSeeds();
     ({ data } = await load());
   }
+  if (await syncSeeds(data)) ({ data } = await load());
   list.replaceChildren();
   if (!data.length) {
     list.append(h("div", { class: "small", style: "margin:0 0 14px" }, "No builds yet. Load the starter set to get going."),
@@ -425,17 +639,19 @@ async function screenBuilds() {
   list.append(h("button", { class: "primary", style: "margin-top:14px", onclick: newBuild }, "+ NEW BUILD"));
 }
 
-async function screenEdit(id) {
+async function screenEdit(id, focus) {
   stopTimer();
   const { data: b0, error } = await sb.from("aoe_build_orders").select("*").eq("id", id).maybeSingle();
   if (error || !b0) { location.hash = "#/builds"; return; }
   const b = JSON.parse(JSON.stringify(b0)); b.steps = b.steps || [];
-  let dirty = false;
+  let dirty = false, detailsOpen = false;
+  const openSteps = new Set(), openItems = new Set(), moreItems = new Set(), moreSteps = new Set();
   const AGES = [["dark", "Dark Age"], ["feudal", "Feudal Age"], ["castle", "Castle Age"], ["imperial", "Imperial Age"]];
   const RES = [["food", "Food"], ["wood", "Wood"], ["gold", "Gold"], ["stone", "Stone"], ["other", "Other"]];
   const saveBtn = h("button", { class: "go", onclick: () => save() }, "SAVE");
   const mark = () => { dirty = true; saveBtn.textContent = "SAVE ●"; };
   const body = h("div");
+  const flip = (set, o) => { set.has(o) ? set.delete(o) : set.add(o); render(); };
 
   const field = (label, obj, key, o = {}) => {
     const inp = o.area ? h("textarea", { rows: o.rows || 2 }) : h("input", { type: o.num ? "number" : "text", inputmode: o.num ? "numeric" : null });
@@ -452,8 +668,11 @@ async function screenEdit(id) {
   const mini = (txt, fn, title) => h("button", { class: "mini", title, onclick: fn }, txt);
   const move = (arr, i, d) => { const j = i + d; if (j < 0 || j >= arr.length) return; [arr[i], arr[j]] = [arr[j], arr[i]]; mark(); render(); };
   const bar = (arr, i, del) => h("div", { class: "ebtns" }, mini("↑", () => move(arr, i, -1), "Move up"), mini("↓", () => move(arr, i, 1), "Move down"), del);
+  const more = (set, o, label, ...kids) => h("div", {}, h("button", { class: "linkbtn", onclick: () => flip(set, o) }, (set.has(o) ? "▾ " : "▸ ") + label), set.has(o) ? kids : null);
   const lastTo = () => Math.max(3, ...b.steps.filter(s => s.to).map(s => s.to));
   const rangeLabel = s => { s.g = s.from === s.to ? String(s.from) : s.from + "–" + s.to; };
+  const typeOf = s => s.open ? "open" : s.from != null ? "vils" : (s.secs > 0 ? "wait" : "instant");
+  const timeText = s => s.m ? "" : s.open ? "open" : s.from != null && s.to >= s.from ? fmt((s.to - s.from + 1) * VIL_SECS) : s.secs > 0 ? fmt(s.secs) : "";
 
   function setType(s, t) {
     delete s.open; delete s.from; delete s.to; delete s.secs;
@@ -463,70 +682,98 @@ async function screenEdit(id) {
     else s.open = true;
   }
 
+  /* ---------- a task inside a step ---------- */
   const itemCard = (s, it, k) => {
+    const open = openItems.has(it);
     const del = mini("✕", () => { s.items.splice(k, 1); mark(); render(); }, "Delete");
     if (it.choice) {
       it.opts = it.opts || [];
+      const sum = h("button", { class: "isum", onclick: () => flip(openItems, it) },
+        h("span", { class: "chev" }, open ? "▾" : "▸"),
+        h("span", { class: "itxt" }, h("b", {}, "Choice: " + (it.t || "…")), h("small", {}, it.opts.map(o => o.t).filter(Boolean).join("  /  "))));
+      if (!open) return h("div", { class: "eitem" }, sum);
       const opts = it.opts.map((o, j) => {
         const goodInp = h("input", { type: "text", placeholder: "cavalry, archers, infantry..." });
         goodInp.value = (o.good || []).join(", ");
         goodInp.oninput = () => { const arr = goodInp.value.split(",").map(x => x.trim().toLowerCase()).filter(Boolean); if (arr.length) o.good = arr; else delete o.good; mark(); };
         return h("div", { class: "eopt" },
-          h("div", { class: "ehead" }, h("b", {}, "Option " + (j + 1)), mini("✕", () => { it.opts.splice(j, 1); mark(); render(); }, "Delete option")),
+          h("div", { class: "ehead2" }, h("b", {}, "Option " + (j + 1)), mini("✕", () => { it.opts.splice(j, 1); mark(); render(); }, "Delete option")),
           field("Title", o, "t"), field("Description", o, "d", { area: true }),
-          h("label", { class: "fld" }, h("span", {}, "Best against (optional, comma separated). Known types: " + TAGS.join(", ")), goodInp),
-          field("Why (shown when it is the best pick)", o, "why"));
+          more(moreItems, o, "Best-against settings",
+            h("label", { class: "fld" }, h("span", {}, "Best against (comma separated). Known types: " + TAGS.join(", ")), goodInp),
+            field("Why (shown when it is the best pick)", o, "why")));
       });
-      return h("div", { class: "eitem" },
-        h("div", { class: "ehead" }, h("b", {}, "Choice (either / or)"), bar(s.items, k, del)),
+      return h("div", { class: "eitem open" }, sum,
+        h("div", { class: "ebtnrow" }, bar(s.items, k, del)),
         field("Heading (e.g. Either, Add complementary units)", it, "t"), opts,
         h("button", { class: "ghost", onclick: () => { it.opts.push({ t: "", d: "" }); mark(); render(); } }, "+ Add option"));
     }
+    const pills = [it.pre ? "before" : null, it.then ? "after" : null, it.side ? "also" : null].filter(Boolean);
+    const sum = h("button", { class: "isum r-" + (it.r || "other"), onclick: () => flip(openItems, it) },
+      h("span", { class: "chev" }, open ? "▾" : "▸"), h("i", { class: "dot" }),
+      h("span", { class: "itxt" }, h("b", {}, it.t || "(untitled)"), open || !it.d ? null : h("small", {}, it.d)),
+      pills.map(p => h("span", { class: "pill" }, p)));
+    if (!open) return h("div", { class: "eitem" }, sum);
     const cb = h("input", { type: "checkbox" }); cb.checked = !!it.side; cb.onchange = () => { it.side = cb.checked; mark(); };
-    return h("div", { class: "eitem" },
-      h("div", { class: "ehead" }, h("b", {}, "Task"), bar(s.items, k, del)),
+    return h("div", { class: "eitem open" }, sum,
+      h("div", { class: "ebtnrow" }, bar(s.items, k, del)),
       field("Title", it, "t"), field("Description", it, "d", { area: true }),
-      select("Resource colour", RES, it.r || "other", v => { it.r = v; }),
-      field("Note before (e.g. Optional)", it, "pre"), field("Note after (e.g. When finished, send them to Wood)", it, "then"),
-      h("label", { class: "tog" }, cb, "Side task (what other units do, shown as \"also\")"));
+      more(moreItems, it, "More options (colour, notes, side task)",
+        select("Resource colour", RES, it.r || "other", v => { it.r = v; }),
+        field("Note before (e.g. Optional, Take 4 villagers from Sheep to...)", it, "pre"),
+        field("Note after (e.g. When finished, send them to Wood)", it, "then"),
+        h("label", { class: "tog" }, cb, "Side task (what other units do, shown as \"also\")")));
   };
 
-  const groupCard = (s, i) => {
+  /* ---------- a step (group of villagers / wait / milestone) ---------- */
+  const stepSummary = s => s.m ? s.m : (s.g || "?") + (s.label ? " · " + s.label.toLowerCase() : "") + "  —  " + (s.items || []).filter(it => !it.side).map(it => it.choice ? it.t : it.t).filter(Boolean).slice(0, 3).join(", ");
+
+  const stepCard = (s, i) => {
+    const open = openSteps.has(s);
+    const head = h("button", { class: "ehead tap", onclick: () => flip(openSteps, s) },
+      h("span", { class: "chev" }, open ? "▾" : "▸"),
+      h("span", { class: "esum" + (s.m ? " mile" : "") }, stepSummary(s)),
+      h("span", { class: "etime" }, timeText(s)));
+    const card = h("div", { class: "ecard" + (open ? " open" : "") + (s.m ? " mile" : ""), id: "step-" + i }, head);
+    if (!open) return card;
+    const del = mini("🗑", () => { if (!s.m && !confirm("Delete this whole step and its tasks?")) return; b.steps.splice(i, 1); mark(); render(); }, "Delete step");
+    const tools = h("div", { class: "ebtnrow" }, bar(b.steps, i, del));
+    if (s.m) { card.append(tools, field("Label", s, "m"), select("Age", AGES, s.age || "dark", v => { s.age = v; })); return card; }
+
     s.items = s.items || [];
-    const type = s.open ? "open" : s.from != null ? "vils" : (s.secs > 0 ? "wait" : "instant");
-    const del = mini("🗑", () => { if (confirm("Delete this whole step and its tasks?")) { b.steps.splice(i, 1); mark(); render(); } }, "Delete step");
+    const type = typeOf(s);
     const timing = type === "vils"
       ? h("div", { class: "erow" }, field("From villager", s, "from", { num: true, commit: () => { rangeLabel(s); render(); } }), field("To villager", s, "to", { num: true, commit: () => { rangeLabel(s); render(); } }))
       : type === "wait" ? field("Wait (seconds)", s, "secs", { num: true, commit: render }) : null;
     const hint = type === "vils" && s.from != null && s.to >= s.from ? h("div", { class: "hint" }, "Takes " + fmt((s.to - s.from + 1) * VIL_SECS) + " (25s per villager)")
       : type === "wait" ? h("div", { class: "hint" }, "Takes " + fmt(s.secs || 0)) : null;
-    return h("div", { class: "ecard" },
-      h("div", { class: "ehead" }, h("b", {}, "Step · " + (s.g || "?")), bar(b.steps, i, del)),
-      select("Timing", [["vils", "New villagers (25s each)"], ["wait", "Timed wait (research etc.)"], ["instant", "No timing"], ["open", "Open-ended (stays on screen)"]], type, v => { setType(s, v); render(); }),
+    card.append(tools,
+      select("Timing", [["vils", "New villagers (25s each)"], ["wait", "Timed wait (age-up research etc.)"], ["instant", "No timing (shown with the next step)"], ["open", "Open-ended (stays on screen)"]], type, v => { setType(s, v); render(); }),
       timing, hint,
-      h("div", { class: "erow" }, field("Big label (e.g. 4–6)", s, "g"), field("Small caption", s, "label")),
-      s.items.map((it, k) => itemCard(s, it, k)),
+      h("div", { class: "tasks" }, s.items.map((it, k) => itemCard(s, it, k))),
       h("div", { class: "erow" },
-        h("button", { class: "ghost", onclick: () => { s.items.push({ t: "", d: "", r: "other" }); mark(); render(); } }, "+ Task"),
-        h("button", { class: "ghost", onclick: () => { s.items.push({ choice: true, t: "Either", opts: [{ t: "", d: "" }, { t: "", d: "" }] }); mark(); render(); } }, "+ Choice")));
+        h("button", { class: "ghost", onclick: () => { const it = { t: "", d: "", r: "other" }; s.items.push(it); openItems.add(it); mark(); render(); } }, "+ Task"),
+        h("button", { class: "ghost", onclick: () => { const it = { choice: true, t: "Either", opts: [{ t: "", d: "" }, { t: "", d: "" }] }; s.items.push(it); openItems.add(it); mark(); render(); } }, "+ Choice")),
+      more(moreSteps, s, "Label options", h("div", { class: "erow" }, field("Big label (e.g. 4–6)", s, "g"), field("Small caption", s, "label"))));
+    return card;
   };
 
-  const mileCard = (s, i) => h("div", { class: "ecard mile" },
-    h("div", { class: "ehead" }, h("b", {}, "Age marker"), bar(b.steps, i, mini("🗑", () => { b.steps.splice(i, 1); mark(); render(); }, "Delete"))),
-    field("Label", s, "m"),
-    select("Age", AGES, s.age || "dark", v => { s.age = v; }));
-
-  const info = h("div", { class: "ecard" },
-    field("Build name", b, "title"), field("Strategy tag (e.g. Fast Castle)", b, "strategy"), field("Civ (leave empty for any)", b, "civ"),
-    field("Overview", b, "overview", { area: true, rows: 3 }));
+  /* ---------- build details ---------- */
+  const info = () => h("div", { class: "ecard open" },
+    field("Build name", b, "title"),
+    h("button", { class: "linkbtn", onclick: () => { detailsOpen = !detailsOpen; render(); } }, (detailsOpen ? "▾ " : "▸ ") + "More details (strategy, civ, overview)"),
+    detailsOpen ? [field("Strategy tag (e.g. Fast Castle)", b, "strategy"), field("Civ (leave empty for any)", b, "civ"), field("Overview", b, "overview", { area: true, rows: 3 })] : null);
 
   function render() {
-    body.replaceChildren(info,
-      ...b.steps.map((s, i) => s.m !== undefined && !s.g ? mileCard(s, i) : groupCard(s, i)),
+    body.replaceChildren(info(),
+      h("div", { class: "erow tools2" },
+        h("button", { class: "linkbtn", onclick: () => { b.steps.forEach(s => openSteps.add(s)); render(); } }, "Expand all"),
+        h("button", { class: "linkbtn", onclick: () => { openSteps.clear(); render(); } }, "Collapse all")),
+      ...b.steps.map(stepCard),
       h("div", { class: "erow" },
-        h("button", { class: "ghost", onclick: () => { const f = lastTo() + 1; b.steps.push({ g: String(f), from: f, to: f, items: [{ t: "", d: "", r: "food" }] }); mark(); render(); } }, "+ Villager step"),
-        h("button", { class: "ghost", onclick: () => { b.steps.push({ g: String(lastTo()), secs: 60, label: "WAIT", items: [{ t: "", d: "", r: "other" }] }); mark(); render(); } }, "+ Wait")),
-      h("button", { class: "ghost", onclick: () => { b.steps.push({ m: "Feudal Age", age: "feudal" }); mark(); render(); } }, "+ Age marker"),
+        h("button", { class: "ghost", onclick: () => { const f = lastTo() + 1; const s = { g: String(f), from: f, to: f, items: [{ t: "", d: "", r: "food" }] }; b.steps.push(s); openSteps.add(s); openItems.add(s.items[0]); mark(); render(); } }, "+ Villager step"),
+        h("button", { class: "ghost", onclick: () => { const s = { g: String(lastTo()), secs: 60, label: "WAIT", items: [{ t: "", d: "", r: "other" }] }; b.steps.push(s); openSteps.add(s); openItems.add(s.items[0]); mark(); render(); } }, "+ Wait")),
+      h("button", { class: "ghost", onclick: () => { const s = { m: "Feudal Age", age: "feudal" }; b.steps.push(s); openSteps.add(s); mark(); render(); } }, "+ Age marker"),
       h("div", { class: "rule" }),
       h("button", { class: "ghost", onclick: copy }, "Save a copy of this build"),
       h("button", { class: "ghost danger", onclick: remove }, "Delete this build"));
@@ -550,17 +797,16 @@ async function screenEdit(id) {
     if (!(b.title || "").trim()) return "Give the build a name.";
     return null;
   }
+  const rowOf = suffix => ({ title: b.title.trim() + suffix, strategy: (b.strategy || "").trim() || null, civ: (b.civ || "").trim() || null, overview: (b.overview || "").trim() || null, steps: cleaned(), source: "manual" });
   async function save() {
     const p = problem(); if (p) return alert(p);
-    const row = { title: b.title.trim(), strategy: (b.strategy || "").trim() || null, civ: (b.civ || "").trim() || null, overview: (b.overview || "").trim() || null, steps: cleaned(), source: "manual" };
-    const { error: e } = await sb.from("aoe_build_orders").update(row).eq("id", id);
+    const { error: e } = await sb.from("aoe_build_orders").update(rowOf("")).eq("id", id);
     if (e) return alert(e.message);
     dirty = false; location.hash = "#/build/" + id;
   }
   async function copy() {
     const p = problem(); if (p) return alert(p);
-    const row = { title: b.title.trim() + " (copy)", strategy: (b.strategy || "").trim() || null, civ: (b.civ || "").trim() || null, overview: (b.overview || "").trim() || null, steps: cleaned(), source: "manual" };
-    const { data, error: e } = await sb.from("aoe_build_orders").insert(row).select("id").single();
+    const { data, error: e } = await sb.from("aoe_build_orders").insert(rowOf(" (copy)")).select("id").single();
     if (e) return alert(e.message);
     dirty = false; location.hash = "#/edit/" + data.id;
   }
@@ -573,10 +819,17 @@ async function screenEdit(id) {
   const leave = () => { if (!dirty || confirm("Discard your unsaved changes?")) { dirty = false; location.hash = "#/build/" + id; } };
 
   $app.replaceChildren(
-    h("header", { class: "slim" }, h("button", { class: "back", onclick: leave }, "‹ Cancel"), h("h1", {}, "Edit Build"), h("p", {}, "Changes are saved when you tap Save")),
+    h("header", { class: "slim" }, h("button", { class: "back", onclick: leave }, "‹ Cancel"), h("h1", {}, "Edit Build"), h("p", {}, "Tap a step to open it. Changes are saved when you tap Save.")),
     h("main", {}, body),
     h("div", { class: "dock" }, h("button", { onclick: leave }, "Cancel"), saveBtn));
+
+  const fi = Number.isInteger(focus) && b.steps[focus] ? focus : null;
+  if (fi !== null) { openSteps.add(b.steps[fi]); if (b.steps[fi].items && b.steps[fi].items.length === 1) openItems.add(b.steps[fi].items[0]); }
   render();
+  if (fi !== null) {
+    const el = document.getElementById("step-" + fi);
+    if (el) { el.classList.add("flash"); setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 50); }
+  }
 }
 
 async function screenBuild(id) {
@@ -623,14 +876,35 @@ async function screenBuild(id) {
   };
 
   const BADGE = { dark: "I", feudal: "II", castle: "III", imperial: "IV" };
+  let selected = -1;
+  const kebab = i => h("button", { class: "kebab", "aria-label": "Step options", onclick: e => { e.stopPropagation(); openSheet(i); } }, "⋮");
   const rows = tl.map((s, i) => {
-    if (s.m) return h("div", { class: "row mile" }, h("div", { class: "ttl", "data-badge": BADGE[s.age] || "•" }, s.m));
-    return h("div", { class: "row grp" },
+    let row;
+    if (s.m) row = h("div", { class: "row mile" }, h("div", { class: "ttl", "data-badge": BADGE[s.age] || "•" }, s.m), h("div", { class: "right" }, kebab(i)));
+    else row = h("div", { class: "row grp" },
       h("div", { class: "pop" }, s.g, h("small", {}, s.label || "VILLAGERS")),
       h("div", {}, s.items.map(itemEl)),
-      h("div", { class: "secs" }, s.dur ? fmt(s.dur) : ""),
+      h("div", { class: "right" }, h("div", { class: "secs" }, s.dur ? fmt(s.dur) : ""), kebab(i)),
       h("div", { class: "bar" }));
+    row.addEventListener("click", e => {
+      if (e.target.closest(".opt")) return;
+      selected = selected === i ? -1 : i;
+      rows.forEach((r, j) => r.classList.toggle("sel", j === selected));
+    });
+    return row;
   });
+
+  function openSheet(i) {
+    const close = () => bg.remove();
+    const btn = (txt, fn, cls) => h("button", { class: "sheetbtn " + (cls || ""), onclick: () => { close(); fn && fn(); } }, txt);
+    const bg = h("div", { class: "sheetbg", onclick: e => { if (e.target === bg) close(); } },
+      h("div", { class: "sheet" },
+        h("div", { class: "sheettitle" }, tl[i].m ? tl[i].m : "Step " + tl[i].g + (tl[i].label ? " · " + tl[i].label.toLowerCase() : "")),
+        btn("✎  Edit this step", () => { location.hash = "#/edit/" + id + "/" + i; }),
+        btn("▶  Start the timer from here", () => seek(tl[i].start)),
+        btn("Cancel", null, "cancel")));
+    document.body.append(bg);
+  }
 
   function updateChoices() {
     const tags = enemyTags();
@@ -729,7 +1003,6 @@ async function screenBuild(id) {
     const to = Math.min(timed.length - 1, Math.max(0, (here < 0 ? 0 : here) + d));
     seek(tl[timed[to]].start);
   }
-  rows.forEach((r, i) => { if (timed.includes(i)) r.addEventListener("click", e => { if (!e.target.closest(".opt")) seek(tl[i].start); }); });
   goBtn.onclick = () => running ? pause() : start();
   paint();
 }
@@ -740,7 +1013,7 @@ function route() {
   const p = location.hash.replace(/^#\/?/, "");
   window.scrollTo(0, 0);
   if (p.startsWith("build/")) return screenBuild(p.slice(6));
-  if (p.startsWith("edit/")) return screenEdit(p.slice(5));
+  if (p.startsWith("edit/")) { const [eid, idx] = p.slice(5).split("/"); return screenEdit(eid, idx !== undefined ? Number(idx) : undefined); }
   if (p === "builds") return screenBuilds();
   return screenHome();
 }
