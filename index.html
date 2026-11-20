@@ -188,6 +188,7 @@
   .srow .sbar { height:8px; border-radius:4px; background:#241b15; overflow:hidden; } .srow .sbar i { display:block; height:100%; background:var(--wood); }
   .srow .snum { text-align:right; color:var(--gold-soft); font-size:13.5px; } .srow .sname { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .game { display:flex; flex-direction:column; gap:1px; padding:9px 12px; margin-bottom:6px; border-radius:10px; border:1px solid var(--line); border-left:5px solid var(--line); background:var(--card); font-size:14px; }
+  .game { cursor:pointer; } .gedit { margin-top:8px; padding-top:8px; border-top:1px dashed var(--line); cursor:default; }
   .game b { font:700 15px var(--head); } .game.win { border-left-color:var(--wood); } .game.loss { border-left-color:var(--brick); }
   .dock { position:fixed; left:0; right:0; bottom:0; padding:10px 14px calc(10px + env(safe-area-inset-bottom)); background:rgba(31,24,20,.96); border-top:2px solid var(--gold); display:flex; gap:10px; align-items:center; justify-content:center; backdrop-filter:blur(6px); z-index:5; }
   .dock .time { font:700 24px var(--head); min-width:78px; text-align:center; }
@@ -222,7 +223,7 @@ const SUPABASE_URL  = "https://wupafyrlpzxbvhpvpfvg.supabase.co";
 const SUPABASE_ANON = "sb_publishable_3O7138aIMet40AwenYXGNQ_5hPBZewU";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-const APP_VERSION = "v4.4";
+const APP_VERSION = "v4.5";
 const VIL_SECS = 25;   // seconds to make one villager
 const $app = document.getElementById("app");
 let user = null, timer = null, wake = null;
@@ -1028,6 +1029,8 @@ const modeOf = mt => mt === 6 ? "1v1" : (mt === 7 || mt === 8 || mt === 9) ? "te
 const civOverrides = () => store.get("civ_names", {});
 const civName = id => id == null ? "?" : (civOverrides()[id] || CIV_NAMES[id] || ("Civ #" + id));
 const MAP_FIX = { nomad:"Nomad", megarandom:"Mega Random", goldenpit:"Golden Pit", goldenswamp:"Golden Swamp", africanclearing:"African Clearing", fourlakes:"Four Lakes", blackforest:"Black Forest", ghostlake:"Ghost Lake", nildelta:"Nile Delta", arabia:"Arabia", arena:"Arena", islands:"Islands", yucatan:"Yucatan", fortress:"Fortress", mediterranean:"Mediterranean", michi:"Michi", kilimanjaro:"Kilimanjaro", valley:"Valley", acropolis:"Acropolis", serengeti:"Serengeti" };
+const KNOWN_MATCH_MAPS = { 521243334:"Black Forest", 520072500:"African Clearing", 520065747:"Fortified Clearing", 517612733:"Fortified Clearing", 517607080:"Fortified Clearing", 517601304:"African Clearing", 517594693:"African Clearing", 514225609:"Oasis", 514221392:"Hideout" };
+const matchMaps = () => Object.assign({}, KNOWN_MATCH_MAPS, store.get("match_maps", {}));
 const mapOverrides = () => store.get("map_names", {});
 const mapName = f => {
   if (!f) return "Unknown";
@@ -1100,6 +1103,7 @@ async function screenStats() {
         if (up.error) throw new Error(up.error.message);
       }
       await loadSaved();
+      learnMaps();
       status.replaceChildren("Updated: " + rows.length + " games from the API, " + all.length + " saved in total.",
         rows.length ? "" : h("details", { class: "sec" }, h("summary", {}, "Show what the API sent back"), h("pre", { style: "white-space:pre-wrap;word-break:break-all;font-size:11px;color:var(--other)" }, lastApi)));
     } catch (e) {
@@ -1109,7 +1113,7 @@ async function screenStats() {
     paint();
   };
 
-  const rowsFor = () => all.map(r => Object.assign({}, r, { map: r.raw && r.raw.mapfile ? mapName(r.raw.mapfile) : r.map, civ: r.raw && r.raw.race_id != null ? civName(r.raw.race_id) : r.civ, mt: r.raw && r.raw.mt }))
+  const rowsFor = () => all.map(r => Object.assign({}, r, { map: matchMaps()[r.match_id] || (r.raw && r.raw.mapfile ? mapName(r.raw.mapfile) : r.map), civ: r.raw && r.raw.race_id != null ? civName(r.raw.race_id) : r.civ, mt: r.raw && r.raw.mt }))
     .filter(r => mode === "all" || modeOf(r.mt) === mode);
   const pct = (w, n) => n ? Math.round(100 * w / n) + "%" : "–";
   const group = (rows, key) => {
@@ -1130,6 +1134,15 @@ async function screenStats() {
     return h("div", { class: "spark" }, h("div", { class: "small" }, "Rating: " + lo + " – " + hi + " (last " + pts.length + " games)"),
       h("div", { innerHTML: `<svg viewBox="0 0 ${W} ${H}" width="100%"><polyline points="${d}" fill="none" stroke="#e0b04a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/></svg>` }));
   };
+  const learnMaps = () => {
+    const seen = {};
+    const mm = matchMaps();
+    for (const r of all) { const f = r.raw && r.raw.mapfile; if (f && mm[r.match_id]) (seen[f] = seen[f] || new Set()).add(mm[r.match_id]); }
+    const o = store.get("map_names", {}); let ch = false;
+    for (const [f, names] of Object.entries(seen)) if (names.size === 1 && !o[f]) { o[f] = [...names][0]; ch = true; }
+    if (ch) store.set("map_names", o);
+  };
+  const openGames = new Set();
   let fixOpen = false;
   const fixPanel = () => {
     const civs = {}, maps = {};
@@ -1180,10 +1193,22 @@ async function screenStats() {
       h("details", { class: "sec", open: "" }, h("summary", {}, "Recent games"),
         h("div", { class: "sbody" }, rows.slice(0, 25).map(r => {
           const diff = r.old_rating && r.new_rating ? r.new_rating - r.old_rating : null;
-          return h("div", { class: "game " + (r.won ? "win" : "loss") },
-            h("b", {}, (r.won ? "Win" : "Loss") + " · " + r.civ), h("span", {}, r.map + " · " + (MATCH_TYPES[r.mt] || "Match") + ((r.raw && r.raw.secs > 0) ? " · " + fmt(r.raw.secs) : "")),
+          const isOpen = openGames.has(r.match_id);
+          const editor = !isOpen ? null : h("div", { class: "gedit", onclick: e => e.stopPropagation() },
+            h("div", { class: "small" }, "Match #" + r.match_id + (r.raw && r.raw.mapfile ? " · file " + r.raw.mapfile : "")),
+            h("div", { class: "addrow" }, h("span", { class: "small", style: "min-width:60px;align-self:center" }, "Map"),
+              h("input", { value: r.map, onchange: e => { const o = store.get("match_maps", {}); o[r.match_id] = e.target.value.trim(); store.set("match_maps", o); learnMaps(); paint(); } })),
+            ((r.raw && r.raw.players) || []).map(pl => h("div", { class: "addrow" },
+              h("span", { class: "small", style: "min-width:60px;align-self:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" }, Number(pl.pid) === Number(pid) ? "You" : pl.name),
+              h("input", { value: pl.civ != null ? civName(pl.civ) : "", placeholder: "Civ" + (pl.civ != null ? " (id " + pl.civ + ")" : ""), onchange: e => {
+                if (pl.civ == null || !e.target.value.trim()) return;
+                const o = civOverrides(); o[pl.civ] = e.target.value.trim(); store.set("civ_names", o); paint(); } }))),
+            h("div", { class: "small" }, "Editing a civ renames that civ ID everywhere. Editing the map only changes this game (and teaches the file name if it's consistent)."));
+          return h("div", { class: "game " + (r.won ? "win" : "loss"), onclick: () => { if (openGames.has(r.match_id)) openGames.delete(r.match_id); else openGames.add(r.match_id); paint(); } },
+            h("b", {}, (r.won ? "Win" : "Loss") + " · " + r.civ + "  ✎"), h("span", {}, r.map + " · " + (MATCH_TYPES[r.mt] || "Match") + ((r.raw && r.raw.secs > 0) ? " · " + fmt(r.raw.secs) : "")),
             playersLine(r),
-            h("span", { class: "small" }, (r.played_at ? new Date(r.played_at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "") + (diff != null ? " · " + (diff > 0 ? "+" : "") + diff + " rating" : "")));
+            h("span", { class: "small" }, (r.played_at ? new Date(r.played_at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "") + (diff != null ? " · " + (diff > 0 ? "+" : "") + diff + " rating" : "")),
+            editor);
         }))),
       fixPanel(),
       lastFirst ? h("details", { class: "sec" }, h("summary", {}, "Debug: raw first game"), h("pre", { style: "white-space:pre-wrap;word-break:break-all;font-size:11px;color:var(--other)" }, lastFirst)) : null,
@@ -1194,6 +1219,7 @@ async function screenStats() {
     const { data: s } = await sb.from("aoe_settings").select("profile_id").maybeSingle();
     if (s && s.profile_id) pid = Number(s.profile_id);
     await loadSaved();
+    learnMaps();
   } catch (e) { body.replaceChildren(h("div", { class: "msg" }, e.message)); return; }
   paint();
   refresh();
