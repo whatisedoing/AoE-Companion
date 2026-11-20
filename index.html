@@ -179,6 +179,16 @@
   .ehead2 b { font:700 14px var(--head); color:var(--gold-soft); }
   @keyframes flash { 0%,100% { box-shadow:none } 30% { box-shadow:0 0 0 3px var(--gold) } }
   .ecard.flash { animation:flash 1.6s ease 1; }
+  .statgrid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; }
+  .stat { background:linear-gradient(180deg,var(--card2),var(--card)); border:1px solid var(--line); border-radius:12px; padding:10px 4px; text-align:center; }
+  .stat b { display:block; font:700 20px var(--head); color:var(--gold-soft); } .stat span { font-size:12px; color:var(--other); }
+  .spark { border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-bottom:12px; background:var(--card); }
+  .sbody { padding:4px 0 6px; }
+  .srow { display:grid; grid-template-columns:110px 1fr 92px; gap:8px; align-items:center; padding:6px 0; font-size:14.5px; }
+  .srow .sbar { height:8px; border-radius:4px; background:#241b15; overflow:hidden; } .srow .sbar i { display:block; height:100%; background:var(--wood); }
+  .srow .snum { text-align:right; color:var(--gold-soft); font-size:13.5px; } .srow .sname { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .game { display:flex; flex-direction:column; gap:1px; padding:9px 12px; margin-bottom:6px; border-radius:10px; border:1px solid var(--line); border-left:5px solid var(--line); background:var(--card); font-size:14px; }
+  .game b { font:700 15px var(--head); } .game.win { border-left-color:var(--wood); } .game.loss { border-left-color:var(--brick); }
   .dock { position:fixed; left:0; right:0; bottom:0; padding:10px 14px calc(10px + env(safe-area-inset-bottom)); background:rgba(31,24,20,.96); border-top:2px solid var(--gold); display:flex; gap:10px; align-items:center; justify-content:center; backdrop-filter:blur(6px); z-index:5; }
   .dock .time { font:700 24px var(--head); min-width:78px; text-align:center; }
   .dock button { border:1px solid var(--line); background:var(--card2); color:var(--text); border-radius:10px; height:46px; min-width:46px; padding:0 14px; font:700 16px var(--body); cursor:pointer; }
@@ -555,7 +565,7 @@ async function screenHome() {
       h("div", { class: "ages" }, ["Dark", "Feudal", "Castle", "Imperial"].map((a, i) => h("span", { class: "age" + (i === 3 ? " on" : "") }, a)))),
     h("main", {},
       tile("t-build", "Build Orders", count, ico('<path d="M6 3h10a3 3 0 0 1 3 3v12a3 3 0 0 0 3 3H8a3 3 0 0 1-3-3V4"/><path d="M9 8h7M9 12h7M9 16h4"/>'), () => location.hash = "#/builds"),
-      tile("t-stats", "My Stats", h("span", {}, "Coming in step 4"), ico('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>')),
+      tile("t-stats", "My Stats", h("span", {}, "Rating, civs, maps, recent games"), ico('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'), () => location.hash = "#/stats"),
       tile("t-gen", "Generate a Build", h("span", {}, "Coming in step 5"), ico('<path d="M12 3l2.2 5.6L20 11l-5.8 2.4L12 19l-2.2-5.6L4 11l5.8-2.4z"/>')),
       h("div", { class: "rule" }),
       h("div", { class: "small" }, "Profile ID ", pid, " · ", h("a", { href: "#", onclick: async e => { e.preventDefault(); await sb.auth.signOut(); location.reload(); } }, "Sign out"))));
@@ -1007,6 +1017,134 @@ async function screenBuild(id) {
   paint();
 }
 
+/* ---------- stats ---------- */
+const API_URL = pid => "https://aoe-api.worldsedgelink.com/community/leaderboard/getRecentMatchHistory?title=age2&profile_ids=" + encodeURIComponent("[" + pid + "]");
+const CIV_NAMES = ["Aztecs","Berbers","Britons","Bulgarians","Burmese","Byzantines","Celts","Chinese","Cumans","Ethiopians","Franks","Goths","Huns","Incas","Hindustanis","Italians","Japanese","Khmer","Koreans","Lithuanians","Magyars","Malay","Malians","Mayans","Mongols","Persians","Portuguese","Saracens","Slavs","Spanish","Tatars","Teutons","Turks","Vietnamese","Vikings","Burgundians","Sicilians","Poles","Bohemians","Bengalis","Dravidians","Gurjaras"];
+const MATCH_TYPES = { 2:"1v1 Death Match",3:"2v2 Death Match",4:"3v3 Death Match",5:"4v4 Death Match",6:"1v1 Random Map",7:"2v2 Random Map",8:"3v3 Random Map",9:"4v4 Random Map",10:"Battle Royale",26:"1v1 Empire Wars",27:"2v2 Empire Wars",28:"3v3 Empire Wars",29:"4v4 Empire Wars",60:"Custom DM 1v1",61:"Custom DM Team" };
+const MODE_FILTERS = [["all","All"],["1v1","1v1 Random Map"],["team","Team Random Map"],["other","Other"]];
+const modeOf = mt => mt === 6 ? "1v1" : (mt === 7 || mt === 8 || mt === 9) ? "team" : "other";
+const civOverrides = () => store.get("civ_names", {});
+const civName = id => id == null ? "?" : (civOverrides()[id] || CIV_NAMES[id] || ("Civ #" + id));
+const mapName = f => !f ? "Unknown" : f.replace(/\.rms2?$/i, "").replace(/[_]+/g, " ").replace(/([a-z])([A-Z])/g, "$1 $2").replace(/\b\w/g, c => c.toUpperCase());
+
+async function fetchMatches(pid) {
+  const res = await fetch(API_URL(pid));
+  if (!res.ok) throw new Error("API answered " + res.status);
+  const j = await res.json();
+  const rows = [];
+  for (const m of j.matchHistoryStats || []) {
+    const me = (m.matchhistoryreportresults || []).find(r => r.profile_id === pid);
+    if (!me) continue;
+    const mem = (m.matchhistorymember || []).find(r => r.profile_id === pid) || {};
+    rows.push({
+      match_id: m.id,
+      played_at: m.startgametime ? new Date(m.startgametime * 1000).toISOString() : null,
+      map: mapName(m.mapname),
+      civ: civName(me.race_id),
+      won: me.resulttype === 1,
+      old_rating: mem.oldrating > 0 ? mem.oldrating : null,
+      new_rating: mem.newrating > 0 ? mem.newrating : null,
+      raw: { mt: m.matchtype_id, race_id: me.race_id, mapfile: m.mapname, secs: (m.completiontime || 0) - (m.startgametime || 0) }
+    });
+  }
+  return rows;
+}
+
+async function screenStats() {
+  stopTimer();
+  let all = [], mode = "all", pid = 21963928;
+  const body = h("div", {}, h("div", { class: "small" }, "Loading..."));
+  const status = h("div", { class: "small" });
+  $app.replaceChildren(
+    h("header", { class: "slim" }, h("button", { class: "back", onclick: () => location.hash = "#/" }, "‹ Home"), h("h1", {}, "My Stats")),
+    h("main", {}, body, status));
+
+  const loadSaved = async () => {
+    const { data, error } = await sb.from("aoe_matches").select("*").order("played_at", { ascending: false }).limit(2000);
+    if (error) throw new Error(error.message);
+    all = data || [];
+  };
+  const refresh = async () => {
+    status.textContent = "Fetching your recent games...";
+    try {
+      const rows = await fetchMatches(pid);
+      if (rows.length) {
+        const up = await sb.from("aoe_matches").upsert(rows, { onConflict: "user_id,match_id" });
+        if (up.error) throw new Error(up.error.message);
+      }
+      await loadSaved();
+      status.textContent = "Updated: " + rows.length + " games from the API, " + all.length + " saved in total.";
+    } catch (e) {
+      status.replaceChildren(h("div", { class: "msg" }, "Couldn't fetch from the game API: " + e.message +
+        (e instanceof TypeError ? " (this usually means the browser blocked it; the fix is a small proxy, tell me and we'll add it)" : "")));
+    }
+    paint();
+  };
+
+  const rowsFor = () => all.map(r => Object.assign({}, r, { civ: r.raw && r.raw.race_id != null ? civName(r.raw.race_id) : r.civ, mt: r.raw && r.raw.mt }))
+    .filter(r => mode === "all" || modeOf(r.mt) === mode);
+  const pct = (w, n) => n ? Math.round(100 * w / n) + "%" : "–";
+  const group = (rows, key) => {
+    const g = {};
+    for (const r of rows) { const k = r[key] || "?"; (g[k] = g[k] || { n: 0, w: 0 }); g[k].n++; if (r.won) g[k].w++; }
+    return Object.entries(g).sort((a, b) => b[1].n - a[1].n);
+  };
+  const table = (title, entries) => h("details", { class: "sec", open: "" }, h("summary", {}, title),
+    h("div", { class: "sbody" }, entries.length ? entries.slice(0, 15).map(([k, v]) =>
+      h("div", { class: "srow" }, h("span", { class: "sname" }, k), h("span", { class: "sbar" }, h("i", { style: "width:" + Math.round(100 * v.w / v.n) + "%" })),
+        h("span", { class: "snum" }, pct(v.w, v.n) + " · " + v.w + "-" + (v.n - v.w))))
+      : h("div", { class: "small" }, "No games yet.")));
+  const spark = rows => {
+    const pts = rows.filter(r => r.new_rating).slice().reverse().map(r => r.new_rating);
+    if (pts.length < 2) return null;
+    const lo = Math.min(...pts), hi = Math.max(...pts), W = 300, H = 70, pad = 6;
+    const d = pts.map((v, i) => (pad + i * (W - 2 * pad) / (pts.length - 1)).toFixed(1) + "," + (H - pad - (hi === lo ? 0.5 : (v - lo) / (hi - lo)) * (H - 2 * pad)).toFixed(1)).join(" ");
+    return h("div", { class: "spark" }, h("div", { class: "small" }, "Rating: " + lo + " – " + hi + " (last " + pts.length + " games)"),
+      h("div", { innerHTML: `<svg viewBox="0 0 ${W} ${H}" width="100%"><polyline points="${d}" fill="none" stroke="#e0b04a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/></svg>` }));
+  };
+  const unknownCivs = () => {
+    const ids = [...new Set(all.map(r => r.raw && r.raw.race_id).filter(id => id != null && !CIV_NAMES[id] && !civOverrides()[id]))];
+    if (!ids.length) return null;
+    return h("details", { class: "sec" }, h("summary", {}, "Name unknown civs (" + ids.length + ")"),
+      h("div", { class: "sbody" }, h("div", { class: "small" }, "New civs get new ID numbers. Type each name once and it's remembered on this device."),
+        ids.map(id => h("div", { class: "addrow" }, h("input", { placeholder: "Civ #" + id, onchange: e => { const o = civOverrides(); o[id] = e.target.value.trim(); store.set("civ_names", o); paint(); } })))));
+  };
+
+  function paint() {
+    const rows = rowsFor();
+    const wins = rows.filter(r => r.won).length;
+    const rated = rows.filter(r => r.new_rating);
+    let streak = 0;
+    for (const r of rows) { if (r.won === rows[0].won) streak++; else break; }
+    body.replaceChildren(
+      h("div", { style: "display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" },
+        MODE_FILTERS.map(([k, l]) => h("button", { class: "chip" + (mode === k ? " on" : ""), onclick: () => { mode = k; paint(); } }, l))),
+      h("div", { class: "statgrid" },
+        [["Games", rows.length], ["Win rate", pct(wins, rows.length)], ["Rating", rated.length ? rated[0].new_rating : "–"], ["Streak", rows.length ? streak + (rows[0].won ? "W" : "L") : "–"]]
+          .map(([l, v]) => h("div", { class: "stat" }, h("b", {}, String(v)), h("span", {}, l)))),
+      spark(rows),
+      table("By civilization", group(rows, "civ")),
+      table("By map", group(rows, "map")),
+      h("details", { class: "sec", open: "" }, h("summary", {}, "Recent games"),
+        h("div", { class: "sbody" }, rows.slice(0, 25).map(r => {
+          const diff = r.old_rating && r.new_rating ? r.new_rating - r.old_rating : null;
+          return h("div", { class: "game " + (r.won ? "win" : "loss") },
+            h("b", {}, (r.won ? "Win" : "Loss") + " · " + r.civ), h("span", {}, r.map + " · " + (MATCH_TYPES[r.mt] || "Match") + (r.raw && r.raw.secs > 0 ? " · " + fmt(r.raw.secs) : "")),
+            h("span", { class: "small" }, (r.played_at ? new Date(r.played_at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "") + (diff != null ? " · " + (diff > 0 ? "+" : "") + diff + " rating" : "")));
+        }))),
+      unknownCivs(),
+      h("button", { class: "primary", style: "margin-top:14px", onclick: refresh }, "REFRESH FROM GAME API"));
+  }
+
+  try {
+    const { data: s } = await sb.from("aoe_settings").select("profile_id").maybeSingle();
+    if (s && s.profile_id) pid = Number(s.profile_id);
+    await loadSaved();
+  } catch (e) { body.replaceChildren(h("div", { class: "msg" }, e.message)); return; }
+  paint();
+  refresh();
+}
+
 /* ---------- router ---------- */
 function route() {
   if (!user) return screenLogin();
@@ -1015,6 +1153,7 @@ function route() {
   if (p.startsWith("build/")) return screenBuild(p.slice(6));
   if (p.startsWith("edit/")) { const [eid, idx] = p.slice(5).split("/"); return screenEdit(eid, idx !== undefined ? Number(idx) : undefined); }
   if (p === "builds") return screenBuilds();
+  if (p === "stats") return screenStats();
   return screenHome();
 }
 window.addEventListener("hashchange", route);
