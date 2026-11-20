@@ -1027,6 +1027,7 @@ const civOverrides = () => store.get("civ_names", {});
 const civName = id => id == null ? "?" : (civOverrides()[id] || CIV_NAMES[id] || ("Civ #" + id));
 const mapName = f => !f ? "Unknown" : f.replace(/\.rms2?$/i, "").replace(/[_]+/g, " ").replace(/([a-z])([A-Z])/g, "$1 $2").replace(/\b\w/g, c => c.toUpperCase());
 
+let lastApi = "";
 async function fetchMatches(pid) {
   let j;
   const viaProxy = await sb.functions.invoke("aoe-proxy", { body: { pid } });
@@ -1036,11 +1037,12 @@ async function fetchMatches(pid) {
     if (!res.ok) throw new Error("API answered " + res.status);
     j = await res.json();
   }
+  lastApi = JSON.stringify(j).slice(0, 1800);
   const rows = [];
   for (const m of j.matchHistoryStats || []) {
-    const me = (m.matchhistoryreportresults || []).find(r => r.profile_id === pid);
+    const me = (m.matchhistoryreportresults || []).find(r => Number(r.profile_id) === Number(pid));
     if (!me) continue;
-    const mem = (m.matchhistorymember || []).find(r => r.profile_id === pid) || {};
+    const mem = (m.matchhistorymember || []).find(r => Number(r.profile_id) === Number(pid)) || {};
     rows.push({
       match_id: m.id,
       played_at: m.startgametime ? new Date(m.startgametime * 1000).toISOString() : null,
@@ -1078,7 +1080,8 @@ async function screenStats() {
         if (up.error) throw new Error(up.error.message);
       }
       await loadSaved();
-      status.textContent = "Updated: " + rows.length + " games from the API, " + all.length + " saved in total.";
+      status.replaceChildren("Updated: " + rows.length + " games from the API, " + all.length + " saved in total.",
+        rows.length ? "" : h("details", { class: "sec" }, h("summary", {}, "Show what the API sent back"), h("pre", { style: "white-space:pre-wrap;word-break:break-all;font-size:11px;color:var(--other)" }, lastApi)));
     } catch (e) {
       status.replaceChildren(h("div", { class: "msg" }, "Couldn't fetch from the game API: " + e.message +
         (e instanceof TypeError ? " (deploy the aoe-proxy function in Supabase, see the steps)" : "")));
