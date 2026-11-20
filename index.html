@@ -222,6 +222,7 @@ const SUPABASE_URL  = "https://wupafyrlpzxbvhpvpfvg.supabase.co";
 const SUPABASE_ANON = "sb_publishable_3O7138aIMet40AwenYXGNQ_5hPBZewU";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
+const APP_VERSION = "v4.2";
 const VIL_SECS = 25;   // seconds to make one villager
 const $app = document.getElementById("app");
 let user = null, timer = null, wake = null;
@@ -568,7 +569,8 @@ async function screenHome() {
       tile("t-stats", "My Stats", h("span", {}, "Rating, civs, maps, recent games"), ico('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'), () => location.hash = "#/stats"),
       tile("t-gen", "Generate a Build", h("span", {}, "Coming in step 5"), ico('<path d="M12 3l2.2 5.6L20 11l-5.8 2.4L12 19l-2.2-5.6L4 11l5.8-2.4z"/>')),
       h("div", { class: "rule" }),
-      h("div", { class: "small" }, "Profile ID ", pid, " · ", h("a", { href: "#", onclick: async e => { e.preventDefault(); await sb.auth.signOut(); location.reload(); } }, "Sign out"))));
+      h("div", { class: "small" }, "Profile ID ", pid, " · ", h("a", { href: "#", onclick: async e => { e.preventDefault(); await sb.auth.signOut(); location.reload(); } }, "Sign out")),
+      h("div", { class: "small", style: "opacity:.6;margin-top:8px" }, APP_VERSION)));
   await sb.from("aoe_settings").upsert({ user_id: user.id }, { onConflict: "user_id", ignoreDuplicates: true });
   const { data: s } = await sb.from("aoe_settings").select("profile_id").maybeSingle();
   pid.textContent = s ? s.profile_id : "?";
@@ -983,6 +985,15 @@ async function screenBuild(id) {
     if (elapsed >= total) return timed[timed.length - 1];
     return timed[0];
   }
+  const playersLine = r => {
+    const pl = (r.raw && r.raw.players) || [];
+    if (!pl.length) return null;
+    const lab = x => (x.name || "?") + (x.civ != null ? " (" + civName(x.civ) + ")" : "");
+    const team = r.raw.team;
+    const mates = pl.filter(x => x.team === team && Number(x.pid) !== Number(pid)).map(lab);
+    const foes = pl.filter(x => x.team !== team).map(lab);
+    return h("span", { class: "small" }, (mates.length ? "With " + mates.join(", ") + " · " : "") + "vs " + foes.join(", "));
+  };
   function paint() {
     timeEl.textContent = fmt(elapsed);
     const cur = currentIdx();
@@ -1025,12 +1036,20 @@ const MODE_FILTERS = [["all","All"],["1v1","1v1 Random Map"],["team","Team Rando
 const modeOf = mt => mt === 6 ? "1v1" : (mt === 7 || mt === 8 || mt === 9) ? "team" : "other";
 const civOverrides = () => store.get("civ_names", {});
 const civName = id => id == null ? "?" : (civOverrides()[id] || CIV_NAMES[id] || ("Civ #" + id));
-const mapName = f => !f ? "Unknown" : f.replace(/\.rms2?$/i, "").replace(/[_]+/g, " ").replace(/([a-z])([A-Z])/g, "$1 $2").replace(/\b\w/g, c => c.toUpperCase());
+const MAP_FIX = { nomad:"Nomad", megarandom:"Mega Random", goldenpit:"Golden Pit", goldenswamp:"Golden Swamp", africanclearing:"African Clearing", fourlakes:"Four Lakes", blackforest:"Black Forest", ghostlake:"Ghost Lake", nildelta:"Nile Delta", nile:"Nile Delta", frigidlake:"Frigid Lake", baltic:"Baltic", arabia:"Arabia", arena:"Arena", islands:"Islands", yucatan:"Yucatan", fortress:"Fortress", mediterranean:"Mediterranean", michi:"Michi", kilimanjaro:"Kilimanjaro", valley:"Valley", acropolis:"Acropolis", serengeti:"Serengeti", highland:"Highland", mountain:"Mountain Pass", steppe:"Steppe", wetlands:"Wetlands" };
+const mapName = f => {
+  if (!f) return "Unknown";
+  let n = String(f).replace(/\.(rms2?|scx|scn)$/i, "").replace(/^(rm|aoe2|ranked|map)[_-]/i, "");
+  const key = n.toLowerCase().replace(/[^a-z]/g, "");
+  if (MAP_FIX[key]) return MAP_FIX[key];
+  return n.replace(/[_-]+/g, " ").replace(/([a-z])([A-Z])/g, "$1 $2").replace(/\b\w/g, c => c.toUpperCase());
+};
 
-let lastApi = "";
+let lastApi = "", lastFirst = "";
 async function fetchMatches(pid) {
   let j;
   const viaProxy = await sb.functions.invoke("aoe-proxy", { body: { pid } });
+  if (!viaProxy.error && viaProxy.data && viaProxy.data.message && !viaProxy.data.matchHistoryStats) throw new Error("the aoe-proxy function still has Supabase's sample code. Paste in the code from aoe-proxy.ts and Deploy again");
   if (!viaProxy.error && viaProxy.data && !viaProxy.data.error) j = viaProxy.data;
   else {
     const res = await fetch(API_URL(pid));
@@ -1038,20 +1057,28 @@ async function fetchMatches(pid) {
     j = await res.json();
   }
   lastApi = JSON.stringify(j).slice(0, 1800);
+  lastFirst = j.matchHistoryStats && j.matchHistoryStats[0] ? JSON.stringify(j.matchHistoryStats[0]).slice(0, 2500) : "";
+  const names = {};
+  for (const p of j.profiles || []) names[p.profile_id] = p.alias || p.name || ("Player " + p.profile_id);
   const rows = [];
   for (const m of j.matchHistoryStats || []) {
-    const me = (m.matchhistoryreportresults || []).find(r => Number(r.profile_id) === Number(pid));
+    const results = m.matchhistoryreportresults || [], members = m.matchhistorymember || [];
+    const me = results.find(r => Number(r.profile_id) === Number(pid));
     if (!me) continue;
-    const mem = (m.matchhistorymember || []).find(r => Number(r.profile_id) === Number(pid)) || {};
+    const memOf = id => members.find(r => Number(r.profile_id) === Number(id)) || {};
+    const civOf = id => { const r = results.find(x => Number(x.profile_id) === Number(id)) || {}; const mm = memOf(id);
+      const v = r.race_id ?? mm.race_id ?? r.civilization_id ?? mm.civilization_id; return v == null ? null : Number(v); };
+    const mem = memOf(pid);
+    const players = results.map(r => ({ pid: r.profile_id, name: names[r.profile_id] || ("Player " + r.profile_id), civ: civOf(r.profile_id), team: r.teamid, won: r.resulttype === 1 }));
     rows.push({
       match_id: m.id,
       played_at: m.startgametime ? new Date(m.startgametime * 1000).toISOString() : null,
       map: mapName(m.mapname),
-      civ: civName(me.race_id),
+      civ: civName(civOf(pid)),
       won: me.resulttype === 1,
       old_rating: mem.oldrating > 0 ? mem.oldrating : null,
       new_rating: mem.newrating > 0 ? mem.newrating : null,
-      raw: { mt: m.matchtype_id, race_id: me.race_id, mapfile: m.mapname, secs: (m.completiontime || 0) - (m.startgametime || 0) }
+      raw: { mt: m.matchtype_id, race_id: civOf(pid), mapfile: m.mapname, secs: (m.completiontime || 0) - (m.startgametime || 0), team: me.teamid, players }
     });
   }
   return rows;
@@ -1089,7 +1116,7 @@ async function screenStats() {
     paint();
   };
 
-  const rowsFor = () => all.map(r => Object.assign({}, r, { civ: r.raw && r.raw.race_id != null ? civName(r.raw.race_id) : r.civ, mt: r.raw && r.raw.mt }))
+  const rowsFor = () => all.map(r => Object.assign({}, r, { map: r.raw && r.raw.mapfile ? mapName(r.raw.mapfile) : r.map, civ: r.raw && r.raw.race_id != null ? civName(r.raw.race_id) : r.civ, mt: r.raw && r.raw.mt }))
     .filter(r => mode === "all" || modeOf(r.mt) === mode);
   const pct = (w, n) => n ? Math.round(100 * w / n) + "%" : "–";
   const group = (rows, key) => {
@@ -1133,14 +1160,17 @@ async function screenStats() {
       spark(rows),
       table("By civilization", group(rows, "civ")),
       table("By map", group(rows, "map")),
+      table("Against civilization", (() => { const g = {}; for (const r of rows) for (const pl of (r.raw && r.raw.players) || []) { if (pl.team === r.raw.team || pl.civ == null) continue; const k = civName(pl.civ); (g[k] = g[k] || { n: 0, w: 0 }); g[k].n++; if (r.won) g[k].w++; } return Object.entries(g).sort((a, b) => b[1].n - a[1].n); })()),
       h("details", { class: "sec", open: "" }, h("summary", {}, "Recent games"),
         h("div", { class: "sbody" }, rows.slice(0, 25).map(r => {
           const diff = r.old_rating && r.new_rating ? r.new_rating - r.old_rating : null;
           return h("div", { class: "game " + (r.won ? "win" : "loss") },
             h("b", {}, (r.won ? "Win" : "Loss") + " · " + r.civ), h("span", {}, r.map + " · " + (MATCH_TYPES[r.mt] || "Match") + (r.raw && r.raw.secs > 0 ? " · " + fmt(r.raw.secs) : "")),
+            playersLine(r),
             h("span", { class: "small" }, (r.played_at ? new Date(r.played_at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "") + (diff != null ? " · " + (diff > 0 ? "+" : "") + diff + " rating" : "")));
         }))),
       unknownCivs(),
+      lastFirst ? h("details", { class: "sec" }, h("summary", {}, "Debug: raw first game"), h("pre", { style: "white-space:pre-wrap;word-break:break-all;font-size:11px;color:var(--other)" }, lastFirst)) : null,
       h("button", { class: "primary", style: "margin-top:14px", onclick: refresh }, "REFRESH FROM GAME API"));
   }
 
