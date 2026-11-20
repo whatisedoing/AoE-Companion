@@ -131,6 +131,23 @@
   .row.mile .ttl::before { content:attr(data-badge); font:700 12px var(--head); background:var(--gold); color:#3b2410; border-radius:50%; width:24px; height:24px; display:grid; place-items:center; }
   .compact .row .note, .compact .row .then { display:none; } .compact .row { padding:8px 12px; margin-bottom:5px; } .compact .it .ttl { font-size:16px; } .compact .it .pre { font-size:12px; }
 
+  .fld { display:block; margin:10px 0 0; }
+  .fld span { display:block; font-size:13px; color:var(--muted); margin-bottom:4px; }
+  .fld input, .fld select, .fld textarea { margin:0; }
+  textarea { width:100%; padding:12px; border-radius:10px; border:1px solid var(--line); background:#241a14; color:var(--text); font:inherit; resize:vertical; }
+  textarea:focus { outline:2px solid var(--gold); border-color:transparent; }
+  .ecard { border:1px solid var(--line); border-radius:14px; padding:12px; margin-bottom:12px; background:linear-gradient(180deg, var(--card2), var(--card)); }
+  .ecard.mile { border-style:dashed; }
+  .eitem, .eopt { border:1px solid var(--line); border-radius:10px; padding:10px; margin-top:12px; background:rgba(0,0,0,.18); }
+  .eopt { background:rgba(255,255,255,.04); }
+  .ehead { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .ehead b { font:700 15px var(--head); color:var(--gold-soft); }
+  .ebtns { display:flex; gap:6px; }
+  .mini { border:1px solid var(--line); background:var(--card); color:var(--text); border-radius:8px; min-width:36px; height:34px; font:700 15px var(--body); cursor:pointer; }
+  .erow { display:flex; gap:8px; } .erow > * { flex:1; min-width:0; }
+  .hint { color:var(--muted); font-size:13.5px; margin-top:6px; }
+  button.danger { color:#ff9c8a; border-color:#7a3a30; }
+  .hbtn { position:absolute; right:16px; top:calc(20px + env(safe-area-inset-top)); background:rgba(0,0,0,.25); border:1px solid var(--gold-soft); color:var(--gold-soft); border-radius:999px; padding:6px 16px; font:700 14px var(--body); cursor:pointer; }
   .dock { position:fixed; left:0; right:0; bottom:0; padding:10px 14px calc(10px + env(safe-area-inset-bottom)); background:rgba(31,24,20,.96); border-top:2px solid var(--gold); display:flex; gap:10px; align-items:center; justify-content:center; backdrop-filter:blur(6px); z-index:5; }
   .dock .time { font:700 24px var(--head); min-width:78px; text-align:center; }
   .dock button { border:1px solid var(--line); background:var(--card2); color:var(--text); border-radius:10px; height:46px; min-width:46px; padding:0 14px; font:700 16px var(--body); cursor:pointer; }
@@ -273,6 +290,49 @@ const SEEDS = [{
         { t: "Halberdier", d: "Spear infantry to protect your Cav Archers", good: ["cavalry", "camels"], why: "Counters cavalry and camels" }] },
       I("Siege", "Add Siege", "other")] }
   ]
+}, {
+  title: "25+2 Fast Castle into Unique Unit", strategy: "Fast Castle",
+  overview: "Click Feudal at 25 villagers with 2 more to follow, go up to Castle Age, and drop a Castle using your stone miners.",
+  steps: [
+    M("Dark Age", "dark"),
+    { g: "3", secs: 0, label: "START", items: [
+      I("Queue up Villagers", "Queue up as many Villagers as you can in your Town Center", "other"),
+      I("2 Houses", "Two Villagers build one, one Villager builds the other", "other", { then: "When finished, send them to Sheep" })] },
+    { g: "4–6", from: 4, to: 6, items: [I("Sheep", "Send your new Villagers to Sheep", "food")] },
+    { g: "7–9", from: 7, to: 9, items: [I("Wood", "Send your new Villagers to collect Wood", "wood")] },
+    { g: "10", from: 10, to: 10, items: [I("Lure Boar", "Send your new Villager to lure the nearest Boar", "food")] },
+    { g: "11", from: 11, to: 11, items: [
+      I("2 Houses", "Send your new Villager to build a house", "other", { then: "When finished, build a Mill on Berries" }),
+      I("Lure Deer", "", "food", { side: true })] },
+    { g: "12–14", from: 12, to: 14, items: [
+      I("Add 3 to hunt", "Send your new Villager to lure the nearest Boar", "food"),
+      I("Lure 2nd Boar", "Send one of your Villagers collecting from Boar to lure your 2nd Boar", "food", { side: true })] },
+    { g: "15–18", from: 15, to: 18, items: [
+      I("Berries", "Send your new Villagers to Berries", "food"),
+      I("Send 3 Hunt vils to Farms", "Send your new Villagers to build Farms next to your Town Center or Mills", "food")] },
+    { g: "19–23", from: 19, to: 23, items: [
+      I("House", "Send your new Villager to build a house", "other"),
+      I("Wood", "Send your new Villagers to collect Wood", "wood")] },
+    { g: "24–25", from: 24, to: 25, items: [I("Gold", "Send your new Villagers to mine Gold", "gold")] },
+    { g: "25", secs: 130, label: "FEUDAL RESEARCH", items: [I("Queue Feudal Age", "Queue Feudal Age in your Town Center", "other")] },
+    M("Feudal Age", "feudal"),
+    { g: "25", secs: 0, items: [
+      I("Send 4 hunt vils to Stone", "Send your new Villagers to mine Stone", "stone"),
+      I("Send remaining 3 hunt vils to Straggler Trees", "Send your new Villagers to collect Wood", "wood")] },
+    { g: "26–27", from: 26, to: 27, items: [
+      I("Stone", "Send your new Villagers to mine Stone", "stone"),
+      I("Blacksmith", "Build a Blacksmith", "other"),
+      I("Market", "Build a Market", "other")] },
+    { g: "27", secs: 160, label: "CASTLE RESEARCH", items: [I("Queue Castle Age", "Queue Castle Age in your Town Center", "other")] },
+    M("Castle Age", "castle"),
+    { g: "27", open: true, items: [
+      I("Double-Bit Axe", "Research Double-Bit Axe in a Lumber Camp", "wood"),
+      I("Horse Collar", "Research in your Mill", "food"),
+      I("Drop a castle", "Drop a castle with stone vils", "stone"),
+      I("Bow Saw", "Research in a Lumber Camp", "wood"),
+      I("Heavy Plow", "Research Heavy Plow at your Mill", "food"),
+      I("Fletching", "Research Fletching in your Blacksmith", "other")] }
+  ]
 }];
 
 /* ---------- screens ---------- */
@@ -314,12 +374,21 @@ async function screenHome() {
   count.textContent = n ? n + " saved" : "Load your starter builds";
 }
 
-async function reloadSeeds() {
-  const del = await sb.from("aoe_build_orders").delete().eq("source", "seed");
-  if (del.error) return del.error.message;
-  const rows = SEEDS.map(s => ({ title: s.title, strategy: s.strategy, overview: s.overview, steps: s.steps, source: "seed" }));
+async function addMissingSeeds() {
+  const { data, error } = await sb.from("aoe_build_orders").select("title");
+  if (error) return error.message;
+  const have = (data || []).map(r => r.title);
+  const rows = SEEDS.filter(s => !have.includes(s.title)).map(s => ({ title: s.title, strategy: s.strategy, overview: s.overview, steps: s.steps, source: "seed" }));
+  if (!rows.length) return null;
   const ins = await sb.from("aoe_build_orders").insert(rows);
   return ins.error ? ins.error.message : null;
+}
+
+async function newBuild() {
+  const { data, error } = await sb.from("aoe_build_orders")
+    .insert({ title: "New build", steps: [M("Dark Age", "dark"), { g: "3", secs: 0, label: "START", items: [] }], source: "manual" })
+    .select("id").single();
+  if (error) alert(error.message); else location.hash = "#/edit/" + data.id;
 }
 
 async function screenBuilds() {
@@ -328,19 +397,21 @@ async function screenBuilds() {
   $app.replaceChildren(
     h("header", { class: "slim" }, h("button", { class: "back", onclick: () => location.hash = "#/" }, "‹ Home"), h("h1", {}, "Build Orders")),
     h("main", {}, list));
-  let { data, error } = await sb.from("aoe_build_orders").select("id,title,strategy,civ,steps,source").order("created_at");
+  const load = () => sb.from("aoe_build_orders").select("id,title,strategy,civ,steps,source").order("created_at");
+  let { data, error } = await load();
   if (error) { list.replaceChildren(h("div", { class: "msg" }, error.message)); return; }
-  // older starter builds used a previous step format: replace them automatically
-  if (data.some(b => b.source === "seed" && (b.steps || []).some(s => !s.g && !s.m))) {
-    const err = await reloadSeeds();
-    if (err) { list.replaceChildren(h("div", { class: "msg" }, err)); return; }
-    ({ data } = await sb.from("aoe_build_orders").select("id,title,strategy,civ,steps,source").order("created_at"));
+  // starter builds from an older step format are replaced automatically
+  const old = data.filter(b => b.source === "seed" && (b.steps || []).some(s => !s.g && !s.m));
+  if (old.length) {
+    const d = await sb.from("aoe_build_orders").delete().in("id", old.map(b => b.id));
+    if (d.error) { list.replaceChildren(h("div", { class: "msg" }, d.error.message)); return; }
+    await addMissingSeeds();
+    ({ data } = await load());
   }
   list.replaceChildren();
   if (!data.length) {
     list.append(h("div", { class: "small", style: "margin:0 0 14px" }, "No builds yet. Load the starter set to get going."),
-      h("button", { class: "primary", onclick: async () => { const e = await reloadSeeds(); if (e) alert(e); else screenBuilds(); } }, "LOAD STARTER BUILDS"));
-    return;
+      h("button", { class: "primary", onclick: async () => { const e = await addMissingSeeds(); if (e) alert(e); else screenBuilds(); } }, "LOAD STARTER BUILDS"));
   }
   data.forEach(b => {
     const pops = (b.steps || []).filter(s => s.to).map(s => s.to);
@@ -349,7 +420,163 @@ async function screenBuilds() {
       h("b", {}, b.title),
       h("span", {}, b.strategy ? h("span", { class: "tag" }, b.strategy) : null, b.civ ? h("span", { class: "tag" }, b.civ) : null, maxPop ? "to " + maxPop + " villagers" : "")));
   });
-  list.append(h("button", { class: "ghost", onclick: async () => { if (confirm("Replace the starter builds with the latest versions? Builds you made yourself are not touched.")) { const e = await reloadSeeds(); if (e) alert(e); else screenBuilds(); } } }, "Reload starter builds"));
+  const missing = SEEDS.filter(s => !data.some(b => b.title === s.title)).length;
+  if (data.length && missing) list.append(h("button", { class: "ghost", onclick: async () => { const e = await addMissingSeeds(); if (e) alert(e); else screenBuilds(); } }, "Add starter builds (" + missing + " new)"));
+  list.append(h("button", { class: "primary", style: "margin-top:14px", onclick: newBuild }, "+ NEW BUILD"));
+}
+
+async function screenEdit(id) {
+  stopTimer();
+  const { data: b0, error } = await sb.from("aoe_build_orders").select("*").eq("id", id).maybeSingle();
+  if (error || !b0) { location.hash = "#/builds"; return; }
+  const b = JSON.parse(JSON.stringify(b0)); b.steps = b.steps || [];
+  let dirty = false;
+  const AGES = [["dark", "Dark Age"], ["feudal", "Feudal Age"], ["castle", "Castle Age"], ["imperial", "Imperial Age"]];
+  const RES = [["food", "Food"], ["wood", "Wood"], ["gold", "Gold"], ["stone", "Stone"], ["other", "Other"]];
+  const saveBtn = h("button", { class: "go", onclick: () => save() }, "SAVE");
+  const mark = () => { dirty = true; saveBtn.textContent = "SAVE ●"; };
+  const body = h("div");
+
+  const field = (label, obj, key, o = {}) => {
+    const inp = o.area ? h("textarea", { rows: o.rows || 2 }) : h("input", { type: o.num ? "number" : "text", inputmode: o.num ? "numeric" : null });
+    inp.value = obj[key] ?? "";
+    if (o.commit) inp.onchange = () => { obj[key] = inp.value === "" ? null : Number(inp.value); mark(); o.commit(); };
+    else inp.oninput = () => { obj[key] = o.num ? (inp.value === "" ? null : Number(inp.value)) : inp.value; mark(); };
+    return h("label", { class: "fld" }, h("span", {}, label), inp);
+  };
+  const select = (label, opts, value, onchange) => {
+    const sel = h("select", {}, opts.map(([v, t]) => h("option", { value: v }, t)));
+    sel.value = value; sel.onchange = () => { onchange(sel.value); mark(); };
+    return h("label", { class: "fld" }, h("span", {}, label), sel);
+  };
+  const mini = (txt, fn, title) => h("button", { class: "mini", title, onclick: fn }, txt);
+  const move = (arr, i, d) => { const j = i + d; if (j < 0 || j >= arr.length) return; [arr[i], arr[j]] = [arr[j], arr[i]]; mark(); render(); };
+  const bar = (arr, i, del) => h("div", { class: "ebtns" }, mini("↑", () => move(arr, i, -1), "Move up"), mini("↓", () => move(arr, i, 1), "Move down"), del);
+  const lastTo = () => Math.max(3, ...b.steps.filter(s => s.to).map(s => s.to));
+  const rangeLabel = s => { s.g = s.from === s.to ? String(s.from) : s.from + "–" + s.to; };
+
+  function setType(s, t) {
+    delete s.open; delete s.from; delete s.to; delete s.secs;
+    if (t === "vils") { s.from = lastTo() + 1; s.to = s.from; rangeLabel(s); }
+    else if (t === "wait") s.secs = 60;
+    else if (t === "instant") s.secs = 0;
+    else s.open = true;
+  }
+
+  const itemCard = (s, it, k) => {
+    const del = mini("✕", () => { s.items.splice(k, 1); mark(); render(); }, "Delete");
+    if (it.choice) {
+      it.opts = it.opts || [];
+      const opts = it.opts.map((o, j) => {
+        const goodInp = h("input", { type: "text", placeholder: "cavalry, archers, infantry..." });
+        goodInp.value = (o.good || []).join(", ");
+        goodInp.oninput = () => { const arr = goodInp.value.split(",").map(x => x.trim().toLowerCase()).filter(Boolean); if (arr.length) o.good = arr; else delete o.good; mark(); };
+        return h("div", { class: "eopt" },
+          h("div", { class: "ehead" }, h("b", {}, "Option " + (j + 1)), mini("✕", () => { it.opts.splice(j, 1); mark(); render(); }, "Delete option")),
+          field("Title", o, "t"), field("Description", o, "d", { area: true }),
+          h("label", { class: "fld" }, h("span", {}, "Best against (optional, comma separated). Known types: " + TAGS.join(", ")), goodInp),
+          field("Why (shown when it is the best pick)", o, "why"));
+      });
+      return h("div", { class: "eitem" },
+        h("div", { class: "ehead" }, h("b", {}, "Choice (either / or)"), bar(s.items, k, del)),
+        field("Heading (e.g. Either, Add complementary units)", it, "t"), opts,
+        h("button", { class: "ghost", onclick: () => { it.opts.push({ t: "", d: "" }); mark(); render(); } }, "+ Add option"));
+    }
+    const cb = h("input", { type: "checkbox" }); cb.checked = !!it.side; cb.onchange = () => { it.side = cb.checked; mark(); };
+    return h("div", { class: "eitem" },
+      h("div", { class: "ehead" }, h("b", {}, "Task"), bar(s.items, k, del)),
+      field("Title", it, "t"), field("Description", it, "d", { area: true }),
+      select("Resource colour", RES, it.r || "other", v => { it.r = v; }),
+      field("Note before (e.g. Optional)", it, "pre"), field("Note after (e.g. When finished, send them to Wood)", it, "then"),
+      h("label", { class: "tog" }, cb, "Side task (what other units do, shown as \"also\")"));
+  };
+
+  const groupCard = (s, i) => {
+    s.items = s.items || [];
+    const type = s.open ? "open" : s.from != null ? "vils" : (s.secs > 0 ? "wait" : "instant");
+    const del = mini("🗑", () => { if (confirm("Delete this whole step and its tasks?")) { b.steps.splice(i, 1); mark(); render(); } }, "Delete step");
+    const timing = type === "vils"
+      ? h("div", { class: "erow" }, field("From villager", s, "from", { num: true, commit: () => { rangeLabel(s); render(); } }), field("To villager", s, "to", { num: true, commit: () => { rangeLabel(s); render(); } }))
+      : type === "wait" ? field("Wait (seconds)", s, "secs", { num: true, commit: render }) : null;
+    const hint = type === "vils" && s.from != null && s.to >= s.from ? h("div", { class: "hint" }, "Takes " + fmt((s.to - s.from + 1) * VIL_SECS) + " (25s per villager)")
+      : type === "wait" ? h("div", { class: "hint" }, "Takes " + fmt(s.secs || 0)) : null;
+    return h("div", { class: "ecard" },
+      h("div", { class: "ehead" }, h("b", {}, "Step · " + (s.g || "?")), bar(b.steps, i, del)),
+      select("Timing", [["vils", "New villagers (25s each)"], ["wait", "Timed wait (research etc.)"], ["instant", "No timing"], ["open", "Open-ended (stays on screen)"]], type, v => { setType(s, v); render(); }),
+      timing, hint,
+      h("div", { class: "erow" }, field("Big label (e.g. 4–6)", s, "g"), field("Small caption", s, "label")),
+      s.items.map((it, k) => itemCard(s, it, k)),
+      h("div", { class: "erow" },
+        h("button", { class: "ghost", onclick: () => { s.items.push({ t: "", d: "", r: "other" }); mark(); render(); } }, "+ Task"),
+        h("button", { class: "ghost", onclick: () => { s.items.push({ choice: true, t: "Either", opts: [{ t: "", d: "" }, { t: "", d: "" }] }); mark(); render(); } }, "+ Choice")));
+  };
+
+  const mileCard = (s, i) => h("div", { class: "ecard mile" },
+    h("div", { class: "ehead" }, h("b", {}, "Age marker"), bar(b.steps, i, mini("🗑", () => { b.steps.splice(i, 1); mark(); render(); }, "Delete"))),
+    field("Label", s, "m"),
+    select("Age", AGES, s.age || "dark", v => { s.age = v; }));
+
+  const info = h("div", { class: "ecard" },
+    field("Build name", b, "title"), field("Strategy tag (e.g. Fast Castle)", b, "strategy"), field("Civ (leave empty for any)", b, "civ"),
+    field("Overview", b, "overview", { area: true, rows: 3 }));
+
+  function render() {
+    body.replaceChildren(info,
+      ...b.steps.map((s, i) => s.m !== undefined && !s.g ? mileCard(s, i) : groupCard(s, i)),
+      h("div", { class: "erow" },
+        h("button", { class: "ghost", onclick: () => { const f = lastTo() + 1; b.steps.push({ g: String(f), from: f, to: f, items: [{ t: "", d: "", r: "food" }] }); mark(); render(); } }, "+ Villager step"),
+        h("button", { class: "ghost", onclick: () => { b.steps.push({ g: String(lastTo()), secs: 60, label: "WAIT", items: [{ t: "", d: "", r: "other" }] }); mark(); render(); } }, "+ Wait")),
+      h("button", { class: "ghost", onclick: () => { b.steps.push({ m: "Feudal Age", age: "feudal" }); mark(); render(); } }, "+ Age marker"),
+      h("div", { class: "rule" }),
+      h("button", { class: "ghost", onclick: copy }, "Save a copy of this build"),
+      h("button", { class: "ghost danger", onclick: remove }, "Delete this build"));
+  }
+
+  function cleaned() {
+    return b.steps.map(s => {
+      const c = JSON.parse(JSON.stringify(s));
+      if (c.items) c.items = c.items.filter(it => it.choice || (it.t || "").trim()).map(it => {
+        ["d", "pre", "then"].forEach(k => { if (!it[k] || !String(it[k]).trim()) delete it[k]; });
+        if (!it.side) delete it.side;
+        if (it.opts) it.opts = it.opts.filter(o => (o.t || "").trim()).map(o => { ["d", "why"].forEach(k => { if (!o[k] || !String(o[k]).trim()) delete o[k]; }); return o; });
+        return it;
+      });
+      if (c.label !== undefined && !String(c.label).trim()) delete c.label;
+      return c;
+    });
+  }
+  function problem() {
+    for (const s of b.steps) if (s.from != null && (!(s.from >= 1) || !(s.to >= s.from))) return "Step " + s.g + ": the 'To villager' number must be the same as or higher than 'From villager'.";
+    if (!(b.title || "").trim()) return "Give the build a name.";
+    return null;
+  }
+  async function save() {
+    const p = problem(); if (p) return alert(p);
+    const row = { title: b.title.trim(), strategy: (b.strategy || "").trim() || null, civ: (b.civ || "").trim() || null, overview: (b.overview || "").trim() || null, steps: cleaned(), source: "manual" };
+    const { error: e } = await sb.from("aoe_build_orders").update(row).eq("id", id);
+    if (e) return alert(e.message);
+    dirty = false; location.hash = "#/build/" + id;
+  }
+  async function copy() {
+    const p = problem(); if (p) return alert(p);
+    const row = { title: b.title.trim() + " (copy)", strategy: (b.strategy || "").trim() || null, civ: (b.civ || "").trim() || null, overview: (b.overview || "").trim() || null, steps: cleaned(), source: "manual" };
+    const { data, error: e } = await sb.from("aoe_build_orders").insert(row).select("id").single();
+    if (e) return alert(e.message);
+    dirty = false; location.hash = "#/edit/" + data.id;
+  }
+  async function remove() {
+    if (!confirm("Delete \"" + b.title + "\" for good? This cannot be undone.")) return;
+    const { error: e } = await sb.from("aoe_build_orders").delete().eq("id", id);
+    if (e) return alert(e.message);
+    dirty = false; location.hash = "#/builds";
+  }
+  const leave = () => { if (!dirty || confirm("Discard your unsaved changes?")) { dirty = false; location.hash = "#/build/" + id; } };
+
+  $app.replaceChildren(
+    h("header", { class: "slim" }, h("button", { class: "back", onclick: leave }, "‹ Cancel"), h("h1", {}, "Edit Build"), h("p", {}, "Changes are saved when you tap Save")),
+    h("main", {}, body),
+    h("div", { class: "dock" }, h("button", { onclick: leave }, "Cancel"), saveBtn));
+  render();
 }
 
 async function screenBuild(id) {
@@ -451,6 +678,7 @@ async function screenBuild(id) {
 
   $app.replaceChildren(
     h("header", { class: "slim" }, h("button", { class: "back", onclick: () => location.hash = "#/builds" }, "‹ Build Orders"),
+      h("button", { class: "hbtn", onclick: () => location.hash = "#/edit/" + id }, "Edit"),
       h("h1", {}, b.title), h("p", {}, "Build Guide" + (b.civ ? " · " + b.civ : ""))),
     h("main", {},
       sec("Build Overview", b.overview), sec("Pros & Cons", [b.pros, b.cons].filter(Boolean).join("\n\n")), sec("Tips", b.tips),
@@ -512,6 +740,7 @@ function route() {
   const p = location.hash.replace(/^#\/?/, "");
   window.scrollTo(0, 0);
   if (p.startsWith("build/")) return screenBuild(p.slice(6));
+  if (p.startsWith("edit/")) return screenEdit(p.slice(5));
   if (p === "builds") return screenBuilds();
   return screenHome();
 }
