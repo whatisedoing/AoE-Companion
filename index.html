@@ -222,7 +222,7 @@ const SUPABASE_URL  = "https://wupafyrlpzxbvhpvpfvg.supabase.co";
 const SUPABASE_ANON = "sb_publishable_3O7138aIMet40AwenYXGNQ_5hPBZewU";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-const APP_VERSION = "v4.2";
+const APP_VERSION = "v4.3";
 const VIL_SECS = 25;   // seconds to make one villager
 const $app = document.getElementById("app");
 let user = null, timer = null, wake = null;
@@ -985,15 +985,6 @@ async function screenBuild(id) {
     if (elapsed >= total) return timed[timed.length - 1];
     return timed[0];
   }
-  const playersLine = r => {
-    const pl = (r.raw && r.raw.players) || [];
-    if (!pl.length) return null;
-    const lab = x => (x.name || "?") + (x.civ != null ? " (" + civName(x.civ) + ")" : "");
-    const team = r.raw.team;
-    const mates = pl.filter(x => x.team === team && Number(x.pid) !== Number(pid)).map(lab);
-    const foes = pl.filter(x => x.team !== team).map(lab);
-    return h("span", { class: "small" }, (mates.length ? "With " + mates.join(", ") + " · " : "") + "vs " + foes.join(", "));
-  };
   function paint() {
     timeEl.textContent = fmt(elapsed);
     const cur = currentIdx();
@@ -1145,6 +1136,15 @@ async function screenStats() {
         ids.map(id => h("div", { class: "addrow" }, h("input", { placeholder: "Civ #" + id, onchange: e => { const o = civOverrides(); o[id] = e.target.value.trim(); store.set("civ_names", o); paint(); } })))));
   };
 
+  const playersLine = r => {
+    const pl = (r.raw && r.raw.players) || [];
+    if (!pl.length) return null;
+    const lab = x => (x.name || "?") + (x.civ != null ? " (" + civName(x.civ) + ")" : "");
+    const team = r.raw.team;
+    const mates = pl.filter(x => x.team === team && Number(x.pid) !== Number(pid)).map(lab);
+    const foes = pl.filter(x => x.team !== team).map(lab);
+    return h("span", { class: "small" }, (mates.length ? "With " + mates.join(", ") + " · " : "") + "vs " + foes.join(", "));
+  };
   function paint() {
     const rows = rowsFor();
     const wins = rows.filter(r => r.won).length;
@@ -1165,7 +1165,7 @@ async function screenStats() {
         h("div", { class: "sbody" }, rows.slice(0, 25).map(r => {
           const diff = r.old_rating && r.new_rating ? r.new_rating - r.old_rating : null;
           return h("div", { class: "game " + (r.won ? "win" : "loss") },
-            h("b", {}, (r.won ? "Win" : "Loss") + " · " + r.civ), h("span", {}, r.map + " · " + (MATCH_TYPES[r.mt] || "Match") + (r.raw && r.raw.secs > 0 ? " · " + fmt(r.raw.secs) : "")),
+            h("b", {}, (r.won ? "Win" : "Loss") + " · " + r.civ), h("span", {}, r.map + " · " + (MATCH_TYPES[r.mt] || "Match") + ((r.raw && r.raw.secs > 0) ? " · " + fmt(r.raw.secs) : "")),
             playersLine(r),
             h("span", { class: "small" }, (r.played_at ? new Date(r.played_at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "") + (diff != null ? " · " + (diff > 0 ? "+" : "") + diff + " rating" : "")));
         }))),
