@@ -61,27 +61,34 @@
   .t-build { --accent:var(--wood); } .t-stats { --accent:var(--goldres); } .t-gen { --accent:var(--stone); }
 
   input { width:100%; padding:14px; margin-bottom:12px; border-radius:10px; border:1px solid var(--line); background:#241a14; color:var(--text); font:inherit; }
-  input:focus { outline:2px solid var(--gold); border-color:transparent; }
+  input:focus, select:focus { outline:2px solid var(--gold); border-color:transparent; }
+  select { flex:1; padding:11px; border-radius:10px; border:1px solid var(--line); background:#241a14; color:var(--text); font:inherit; min-width:0; }
   button.primary { width:100%; padding:14px; border:1px solid var(--gold); border-radius:10px; cursor:pointer; background:linear-gradient(180deg, #d4503a, var(--brick-dark)); color:#fff; font:700 16px var(--head); letter-spacing:.08em; }
-  button.ghost { width:100%; padding:12px; border:1px dashed var(--line); border-radius:10px; cursor:pointer; background:transparent; color:var(--gold-soft); font:600 15px var(--body); }
+  button.ghost { width:100%; padding:12px; margin-top:6px; border:1px dashed var(--line); border-radius:10px; cursor:pointer; background:transparent; color:var(--gold-soft); font:600 15px var(--body); }
   .msg { color:#ff9c8a; min-height:1.4em; margin:8px 0; }
   .small { color:var(--muted); font-size:14px; text-align:center; margin-top:26px; }
   .small a { color:var(--gold-soft); }
   .rule { height:1px; margin:26px auto 0; max-width:220px; background:linear-gradient(90deg, transparent, var(--gold), transparent); }
   .hidden { display:none !important; }
 
-  /* build list */
   .bcard { display:block; width:100%; text-align:left; background:linear-gradient(180deg, var(--card2), var(--card)); border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin-bottom:12px; color:var(--text); font:inherit; cursor:pointer; }
   .bcard b { font:700 18px var(--head); display:block; }
   .bcard span { color:var(--muted); font-size:14px; }
   .tag { display:inline-block; font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid var(--line); color:var(--gold-soft); margin-right:6px; }
 
-  /* viewer */
   details.sec { border-bottom:1px solid var(--line); padding:10px 2px; }
   details.sec summary { font:700 18px var(--head); cursor:pointer; list-style:none; display:flex; justify-content:space-between; }
   details.sec summary::after { content:"›"; color:var(--gold); transition:transform .2s; }
   details.sec[open] summary::after { transform:rotate(90deg); }
   details.sec p { color:var(--muted); margin:8px 0 4px; white-space:pre-line; }
+  details.sec .chips { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 0; }
+  .addrow { display:flex; gap:8px; margin-top:10px; }
+  .addrow button { border:1px solid var(--gold); background:var(--card2); color:var(--gold-soft); border-radius:10px; padding:0 16px; font:700 15px var(--body); cursor:pointer; }
+  .chip { border:1px solid var(--line); background:var(--card); color:var(--text); border-radius:999px; padding:5px 12px; font:600 14px var(--body); cursor:pointer; }
+  .chip.on { background:var(--gold); color:#3b2410; border-color:var(--gold-soft); }
+  .chip.civ::after { content:" ×"; opacity:.7; }
+  .facing { margin-top:10px; color:var(--gold-soft); font-size:14.5px; }
+
   .toggles { margin:16px 0 10px; display:grid; gap:10px; }
   .tog { display:flex; align-items:center; gap:12px; color:var(--text); font-size:16px; cursor:pointer; }
   .tog input { appearance:none; -webkit-appearance:none; width:46px; height:26px; margin:0; border-radius:999px; background:#4a3a2e; position:relative; flex:0 0 46px; padding:0; border:0; transition:background .2s; }
@@ -90,25 +97,41 @@
   .tog input:checked::after { transform:translateX(20px); }
 
   .steps { margin-top:12px; }
-  .row { position:relative; display:grid; grid-template-columns:54px 1fr auto; gap:12px; align-items:center; padding:12px 12px; margin-bottom:8px; border-radius:12px; border:1px solid var(--line); background:linear-gradient(180deg, var(--card2), var(--card)); overflow:hidden; scroll-margin-top:40vh; }
-  .row .pop { font:700 15px var(--head); color:var(--gold-soft); text-align:center; line-height:1.1; }
-  .row .pop small { display:block; font:600 10px var(--body); color:var(--muted); letter-spacing:.06em; }
-  .row .ttl { display:flex; align-items:center; gap:8px; font-weight:700; font-size:18px; }
-  .dot { width:12px; height:12px; border-radius:50%; flex:0 0 12px; background:var(--other); }
-  .r-food .dot { background:var(--food); } .r-wood .dot { background:var(--wood); } .r-gold .dot { background:var(--goldres); } .r-stone .dot { background:var(--stone); }
-  .row .note { color:var(--muted); font-size:14.5px; margin-top:2px; }
-  .row .secs { color:var(--muted); font-size:13px; text-align:right; }
+  .row { position:relative; display:grid; grid-template-columns:62px 1fr auto; gap:12px; align-items:start; padding:12px; margin-bottom:8px; border-radius:12px; border:1px solid var(--line); background:linear-gradient(180deg, var(--card2), var(--card)); overflow:hidden; scroll-margin-top:30vh; }
+  .row .pop { font:700 17px var(--head); color:var(--gold-soft); text-align:center; line-height:1.1; padding-top:2px; }
+  .row .pop small { display:block; font:600 9.5px var(--body); color:var(--muted); letter-spacing:.06em; margin-top:3px; }
+  .row .secs { color:var(--muted); font-size:13px; text-align:right; padding-top:3px; }
   .row .bar { position:absolute; left:0; bottom:0; height:4px; width:0; background:var(--gold); }
   .row.done { opacity:.4; }
   .row.cur { border-color:var(--gold); box-shadow:0 0 0 2px rgba(224,176,74,.35), 0 6px 18px rgba(0,0,0,.45); background:linear-gradient(180deg,#4a3727,#3a2b20); }
-  .row.mile { grid-template-columns:1fr; background:linear-gradient(90deg, rgba(224,176,74,.16), rgba(224,176,74,.04)); border-style:dashed; }
-  .row.mile .ttl { font:700 16px var(--head); color:var(--gold-soft); }
-  .row.mile.age-feudal .ttl::before { content:"II"; } .row.mile.age-castle .ttl::before { content:"III"; } .row.mile.age-imperial .ttl::before { content:"IV"; }
-  .row.mile[class*="age-"] .ttl::before { font:700 12px var(--head); background:var(--gold); color:#3b2410; border-radius:50%; width:24px; height:24px; display:grid; place-items:center; }
-  .compact .row .note { display:none; } .compact .row { padding:8px 12px; margin-bottom:5px; } .compact .row .ttl { font-size:16px; }
-  .compact .row.mile .note { display:block; }
+  .it { padding:6px 0; }
+  .it + .it { border-top:1px solid rgba(255,255,255,.07); }
+  .it .pre { font-size:12.5px; color:var(--gold-soft); font-style:italic; margin-bottom:1px; }
+  .it .pre::before { content:"✦ "; font-style:normal; }
+  .it .ttl { display:flex; align-items:center; gap:8px; font-weight:700; font-size:18px; flex-wrap:wrap; }
+  .dot { width:12px; height:12px; border-radius:50%; flex:0 0 12px; background:var(--other); }
+  .r-food .dot { background:var(--food); } .r-wood .dot { background:var(--wood); } .r-gold .dot { background:var(--goldres); } .r-stone .dot { background:var(--stone); }
+  .it .note { color:var(--muted); font-size:14.5px; margin-top:1px; }
+  .it .then { color:var(--gold-soft); font-size:13.5px; margin-top:3px; }
+  .it .then::before { content:"→ "; }
+  .it.side { margin-left:10px; padding-left:10px; border-left:3px dashed var(--line); }
+  .alsotag { font:600 10.5px var(--body); letter-spacing:.06em; text-transform:uppercase; border:1px solid var(--line); color:var(--muted); border-radius:999px; padding:1px 7px; }
+  .opts { display:grid; gap:8px; margin-top:6px; }
+  .opt { border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:rgba(0,0,0,.18); }
+  .opt .ttl { font-size:17px; }
+  .opt.best { border-color:var(--gold); background:linear-gradient(180deg, rgba(224,176,74,.22), rgba(224,176,74,.08)); box-shadow:0 0 0 1px rgba(224,176,74,.4); }
+  .opt .why { display:none; font-size:13.5px; color:var(--gold-soft); margin-top:3px; }
+  .opt.best .why { display:block; }
+  .opt.best .ttl::after { content:"★ Best pick"; font:700 11px var(--body); background:var(--gold); color:#3b2410; border-radius:999px; padding:2px 8px; letter-spacing:.04em; }
+  .opt.dim { opacity:.6; }
+  .or { text-align:center; font:700 12px var(--head); color:var(--muted); letter-spacing:.1em; }
 
-  .dock { position:fixed; left:0; right:0; bottom:0; padding:10px 14px calc(10px + env(safe-area-inset-bottom)); background:rgba(31,24,20,.96); border-top:2px solid var(--gold); display:flex; gap:10px; align-items:center; justify-content:center; backdrop-filter:blur(6px); }
+  .row.mile { grid-template-columns:1fr; background:linear-gradient(90deg, rgba(224,176,74,.16), rgba(224,176,74,.04)); border-style:dashed; align-items:center; }
+  .row.mile .ttl { font:700 16px var(--head); color:var(--gold-soft); display:flex; gap:10px; align-items:center; }
+  .row.mile .ttl::before { content:attr(data-badge); font:700 12px var(--head); background:var(--gold); color:#3b2410; border-radius:50%; width:24px; height:24px; display:grid; place-items:center; }
+  .compact .row .note, .compact .row .then { display:none; } .compact .row { padding:8px 12px; margin-bottom:5px; } .compact .it .ttl { font-size:16px; } .compact .it .pre { font-size:12px; }
+
+  .dock { position:fixed; left:0; right:0; bottom:0; padding:10px 14px calc(10px + env(safe-area-inset-bottom)); background:rgba(31,24,20,.96); border-top:2px solid var(--gold); display:flex; gap:10px; align-items:center; justify-content:center; backdrop-filter:blur(6px); z-index:5; }
   .dock .time { font:700 24px var(--head); min-width:78px; text-align:center; }
   .dock button { border:1px solid var(--line); background:var(--card2); color:var(--text); border-radius:10px; height:46px; min-width:46px; padding:0 14px; font:700 16px var(--body); cursor:pointer; }
   .dock button.go { background:linear-gradient(180deg,#d4503a,var(--brick-dark)); border-color:var(--gold); min-width:110px; font-family:var(--head); letter-spacing:.06em; }
@@ -143,13 +166,14 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 const VIL_SECS = 25;   // seconds to make one villager
 const $app = document.getElementById("app");
-let user = null, timer = null;
+let user = null, timer = null, wake = null;
 
 /* ---------- tiny helpers ---------- */
 function h(tag, attrs = {}, ...kids) {
   const el = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
     if (k === "class") el.className = v;
+    else if (k === "innerHTML") el.innerHTML = v;
     else if (k.startsWith("on")) el[k] = v;
     else if (v !== false && v != null) el.setAttribute(k, v);
   }
@@ -157,126 +181,99 @@ function h(tag, attrs = {}, ...kids) {
   return el;
 }
 const fmt = s => { s = Math.max(0, Math.floor(s)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
-const pref = {
-  get(k, d) { try { const v = localStorage.getItem("aoe_" + k); return v === null ? d : v === "1"; } catch { return d; } },
-  set(k, v) { try { localStorage.setItem("aoe_" + k, v ? "1" : "0"); } catch {} }
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("aoe_" + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("aoe_" + k, JSON.stringify(v)); } catch {} }
 };
 const CREST = () => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("class", "crest"); s.innerHTML = '<use href="#crest"/>'; return s; };
-function stopTimer() { if (timer) { clearInterval(timer); timer = null; } releaseWake(); }
-let wake = null;
 async function holdWake() { try { if (navigator.wakeLock) wake = await navigator.wakeLock.request("screen"); } catch {} }
-function releaseWake() { try { if (wake) wake.release(); } catch {} wake = null; }
+function stopTimer() { if (timer) { clearInterval(timer); timer = null; } try { if (wake) wake.release(); } catch {} wake = null; }
 
-/* ---------- starter builds (drafts: check against your trusted sources) ----------
-   V(count, task, resource, note)  = new villagers, each takes 25s
-   M(label, age, note)             = milestone / action row (no waiting)            */
-const V = (v, t, r, n) => ({ v, t, r, n });
-const M = (m, age, n) => ({ m, age, n });
-const FC_OPEN = () => [
-  M("Game start", null, "Queue villagers nonstop. Starting villagers build a house, then go to sheep. Scout for sheep, boar, deer and berries."),
-  V(6, "Sheep", "food", "New villagers go to the sheep under the Town Center."),
-  V(4, "Wood", "wood", "Build a lumber camp at the nearest forest."),
-  V(3, "Boar", "food", "Lure the first boar to the Town Center; lure the second when the first is about half eaten."),
-  V(5, "Berries", "food", "First builds a house, then a mill by the berries. Move to farms when the berries run out."),
-  V(3, "Wood", "wood", "Research Loom."),
-  V(3, "Gold", "gold", "Build a mining camp.")
-];
-const SEEDS = [
-  { title:"Scout Rush (21 pop)", strategy:"Scout Rush",
-    overview:"Fast Feudal into continuous Scout Cavalry to harass the enemy economy. Best with cavalry-bonus civs.",
-    steps:[
-      M("Game start", null, "Queue villagers nonstop. Starting villagers build a house, then go to sheep. Scout for sheep, boar, deer and berries."),
-      V(6,"Sheep","food","New villagers go to the sheep under the Town Center."),
-      V(3,"Wood","wood","Build a lumber camp at the nearest forest."),
-      V(1,"Boar","food","Lure the first boar to the Town Center."),
-      V(2,"Boar","food","Lure the second boar when the first is about half eaten."),
-      V(4,"Berries","food","First builds a house, then a mill by the berries."),
-      V(2,"Wood","wood","Research Loom before clicking up."),
-      M("Click Feudal Age","feudal","At 21 population, aiming for roughly 9:40."),
-      V(3,"Wood","wood","Keep villagers coming. Build a second lumber camp."),
-      M("In Feudal","feudal","One villager builds a Barracks, then a Stable. Scout Cavalry nonstop. Research Double-Bit Axe and Horse Collar."),
-      V(5,"Farms","food","As sheep run out, build farms around the Town Center."),
-      V(4,"Gold","gold","Build a mining camp. Research Bloodlines when affordable."),
-      M("Keep going", null, "Raid with scouts, add spearmen if the enemy answers with archers, and prepare for Castle Age.")
-    ]},
-  { title:"Fast Castle into Knights (27+2)", strategy:"Fast Castle",
-    overview:"Boom to 27 villagers, click Feudal, then Castle Age quickly and mass Knights from two Stables.",
-    steps:[ ...FC_OPEN(),
-      M("Click Feudal Age","feudal","At about 27 population (~10:00). Roughly 14 on food, 10 on wood, 3 on gold."),
-      V(2,"Gold","gold","The \"+2\": two more villagers while Feudal researches."),
-      M("In Feudal","feudal","Three villagers build a Blacksmith and a Stable, then go to gold. Research Double-Bit Axe and Horse Collar."),
-      M("Click Castle Age","castle","Needs 800 food and 200 gold. If short, add 1-2 villagers on food or wood."),
-      V(6,"Gold","gold","New villagers go to gold until about 14 miners. Research Gold Mining."),
-      M("In Castle","castle","Build a second Stable when you have 175 wood. Knights nonstop, villagers one at a time. Research Forging and farm upgrades.")
-    ]},
-  { title:"Fast Castle into Unique Unit (27+2)", strategy:"Fast Castle",
-    overview:"Same economy as the Knights build, but you build a Castle straight away and mass your civ's unique unit.",
-    steps:[ ...FC_OPEN(),
-      M("Click Feudal Age","feudal","At about 27 population (~10:00)."),
-      V(2,"Gold","gold","The \"+2\": two more villagers while Feudal researches."),
-      M("In Feudal","feudal","Build a Blacksmith and a Market (or Stable), then go to gold. Research Double-Bit Axe and Horse Collar."),
-      M("Click Castle Age","castle","Needs 800 food and 200 gold."),
-      M("Build a Castle","castle","Place it right away in a safe spot. Research Gold Mining and the key upgrades for your unique unit."),
-      V(6,"Gold","gold","New villagers go to gold; add farms as food requires."),
-      M("In Castle","castle","Unique unit nonstop from the Castle. Add a second Castle or a Barracks/Stable for support units.")
-    ]},
-  { title:"Archer Flush (22 pop)", strategy:"Archer Flush",
-    overview:"Feudal at 22 villagers, two Archery Ranges, and archers nonstop. Strong against slower openings.",
-    steps:[
-      M("Game start", null, "Queue villagers nonstop. Starting villagers build a house, then go to sheep."),
-      V(6,"Sheep","food","New villagers go to the sheep under the Town Center."),
-      V(4,"Wood","wood","Build a lumber camp."),
-      V(3,"Boar","food","Lure the first boar; the second when the first is about half eaten."),
-      V(4,"Berries","food","First builds a house, then a mill."),
-      V(2,"Wood","wood","Research Loom."),
-      M("Click Feudal Age","feudal","At 22 population, around 10:00."),
-      M("In Feudal","feudal","Two villagers build two Archery Ranges (plus a house if needed). Archers nonstop from both. Research Fletching and Double-Bit Axe."),
-      V(4,"Gold","gold","Build a mining camp. About 6 on gold and 12 on wood supports two ranges."),
-      V(4,"Wood","wood","Build a second lumber camp."),
-      V(4,"Farms","food","Farms as the sheep and berries run out."),
-      M("Castle Age","castle","Click up with a standing archer army, then add Blacksmith upgrades and Crossbowman.")
-    ]},
-  { title:"Men-at-Arms Rush (18 pop)", strategy:"Men-at-Arms Rush",
-    overview:"Click Feudal early and pressure the enemy's woodline and gold with Men-at-Arms, then follow with archers.",
-    steps:[
-      M("Game start", null, "Queue villagers nonstop. Starting villagers build a house, then go to sheep. Luring deer helps this build land faster."),
-      V(6,"Sheep","food","New villagers go to the sheep under the Town Center."),
-      V(3,"Wood","wood","Build a lumber camp."),
-      V(3,"Boar / deer","food","Lure boar or deer to the Town Center."),
-      V(3,"Berries","food","First builds a house, then a mill."),
-      M("Click Feudal Age","feudal","At 18 population, around 8:50 if you lured deer."),
-      M("In Feudal","feudal","Two villagers build a Barracks (and a house). Men-at-Arms nonstop. Research Double-Bit Axe and Horse Collar."),
-      V(5,"Wood","wood","Build a second lumber camp."),
-      V(4,"Gold","gold","Build a mining camp."),
-      M("Follow-up","feudal","Send the Men-at-Arms to harass woodline and gold. Add an Archery Range and archers to defend the counter-attack.")
-    ]},
-  { title:"Fast Castle Boom (27+2)", strategy:"Boom",
-    overview:"Reach Castle on a strong economy, drop extra Town Centers, and out-produce the opponent into Imperial.",
-    steps:[ ...FC_OPEN(),
-      M("Click Feudal Age","feudal","At about 27 population (~10:00)."),
-      V(2,"Wood","wood","The \"+2\": extra villagers to wood while Feudal researches."),
-      M("In Feudal","feudal","Build a Market and a Blacksmith. About 8 farms. Research Double-Bit Axe and Horse Collar."),
-      M("Click Castle Age","castle","Needs 800 food and 200 gold."),
-      M("In Castle","castle","Build two extra Town Centers (one near wood, one near stone or gold) and keep villagers coming from all of them."),
-      V(10,"Farms","food","Boom: villagers constantly from every Town Center. Work toward about 30 farms before Imperial.")
-    ]},
-  { title:"18 Pop Scouts into Cavalry Archers", strategy:"Scouts into Cav Archers",
-    overview:"Open with safe scouts in Feudal and wall in, then switch to Cavalry Archers in Castle. Suits Huns, Mongols, Magyars, Japanese and Tatars.",
-    steps:[
-      M("Game start", null, "Queue villagers nonstop. Scout for sheep, boar, deer and berries."),
-      V(6,"Sheep","food","New villagers go to the sheep under the Town Center."),
-      V(2,"Wood","wood","Build a lumber camp."),
-      V(1,"Boar","food","Lure the nearest boar to the Town Center."),
-      V(3,"Boar","food","Gather the boar under the Town Center."),
-      V(2,"Wood","wood","Four lumberjacks in total."),
-      V(1,"Boar","food","Lure the second boar. Research Loom."),
-      M("Click Feudal Age","feudal","At 18 population, aiming for about 8:50."),
-      V(5,"Wood","wood","Nine on wood in total. Build a second lumber camp."),
-      M("In Feudal","feudal","One villager builds a Barracks, two build a Stable. Scout Cavalry nonstop. Research Double-Bit Axe and start walling your base."),
-      M("Redistribute","feudal","Berries and farms for food, then build two Archery Ranges. Research Gold Mining and Fletching."),
-      M("Castle Age","castle","Research Bloodlines, start Cavalry Archers, then get Bow Saw, Bodkin Arrow and Husbandry.")
-    ]}
-];
+/* ---------- enemy civs -> army tags (my rough read of each civ's typical army; edit freely) ---------- */
+const TAGS = ["cavalry", "archers", "infantry", "camels", "elephants", "gunpowder", "siege"];
+const CIV_TAGS = {
+  Armenians:["infantry","cavalry"], Aztecs:["infantry"], Bengalis:["elephants","archers"], Berbers:["cavalry","camels"],
+  Bohemians:["gunpowder","infantry"], Britons:["archers"], Bulgarians:["cavalry","infantry"], Burgundians:["cavalry"],
+  Burmese:["infantry","elephants"], Byzantines:["camels","infantry"], Celts:["infantry","siege"], Chinese:["archers"],
+  Cumans:["cavalry"], Dravidians:["infantry","archers"], Ethiopians:["archers","infantry"], Franks:["cavalry"],
+  Georgians:["cavalry"], Goths:["infantry"], Gurjaras:["cavalry","camels"], Hindustanis:["camels","gunpowder"],
+  Huns:["cavalry","archers"], Incas:["infantry"], Italians:["archers","gunpowder"], Japanese:["infantry"],
+  Khmer:["elephants","siege"], Koreans:["archers","siege"], Lithuanians:["cavalry"], Magyars:["cavalry"],
+  Malay:["elephants","infantry"], Malians:["infantry","cavalry"], Mayans:["archers","infantry"], Mongols:["cavalry","archers"],
+  Persians:["cavalry","elephants"], Poles:["cavalry","infantry"], Portuguese:["cavalry","gunpowder"], Romans:["infantry","cavalry"],
+  Saracens:["camels","archers"], Sicilians:["infantry","cavalry"], Slavs:["infantry","cavalry"], Spanish:["cavalry","gunpowder"],
+  Tatars:["cavalry","archers"], Teutons:["infantry","cavalry"], Turks:["cavalry","gunpowder"], Vietnamese:["archers","infantry"], Vikings:["infantry"]
+};
+
+/* ---------- build data (format v2) ----------
+   Milestone row : { m:"Feudal Age", age:"feudal" }
+   Group row     : { g:"4–6", from:4, to:6, items:[...] }  timed at 25s per villager
+                   { g:"18", secs:130, label:"FEUDAL RESEARCH", items:[...] }  timed wait
+                   { g:"35+", open:true, items:[...] }  open-ended, stays current
+   Item          : { t, d, r (food/wood/gold/stone), pre, then, side }
+                   { choice:true, t:"Either", opts:[{t,d,good,why}] }                */
+const I = (t, d, r, o = {}) => ({ t, d, r, ...o });
+const M = (m, age) => ({ m, age });
+const SEEDS = [{
+  title: "18 Pop Scouts into Cavalry Archers", strategy: "Scouts into Cav Archers",
+  overview: "Open with safe scouts in Feudal and wall in, then switch to Cavalry Archers in Castle. Suits Huns, Mongols, Magyars, Japanese and Tatars.",
+  steps: [
+    M("Dark Age", "dark"),
+    { g: "3", secs: 0, label: "START", items: [
+      I("Queue up Villagers", "Queue up as many Villagers as you can in your Town Center", "other"),
+      I("2 Houses", "Two Villagers build one, one Villager builds the other", "other", { then: "When finished, send them to Sheep" })] },
+    { g: "4–6", from: 4, to: 6, items: [I("Sheep", "Send your new Villagers to Sheep", "food")] },
+    { g: "7–8", from: 7, to: 8, items: [I("Wood", "Send your new Villagers to collect Wood", "wood")] },
+    { g: "9", from: 9, to: 9, items: [I("Lure Boar", "Send your new Villager to lure the nearest Boar", "food")] },
+    { g: "10", from: 10, to: 10, items: [
+      I("House", "Send your new Villager to build a house", "other"),
+      I("Mill", "Send your new Villager to build a Mill next to your Berries", "food", { then: "When finished, send them to Berries" }),
+      I("Lure Deer", "Once all sheep are found", "food", { side: true })] },
+    { g: "11–16", from: 11, to: 16, items: [
+      I("Sheep / Boar", "Send your new Villagers to Sheep or Boar", "food"),
+      I("Lure 2nd Boar", "Send one of your Villagers collecting from Boar to lure your 2nd Boar", "food", { side: true })] },
+    { g: "17–18", from: 17, to: 18, items: [I("Wood", "Send your new Villagers to collect Wood", "wood")] },
+    { g: "18", secs: 25, label: "LOOM", items: [I("Loom", "Research Loom in your Town Center", "other", { pre: "Optional" })] },
+    { g: "18", secs: 130, label: "FEUDAL RESEARCH", items: [
+      I("Queue Feudal Age", "Queue Feudal Age in your Town Center", "other"),
+      I("Lumber Camp", "Send 5 villagers to build a Lumber Camp", "wood", { pre: "Take 5 villagers from Hunt", then: "When finished, send them to Wood" }),
+      I("Berries", "Send 5 Villagers to Berries", "food", { pre: "Take 5 villagers from Hunt" }),
+      I("Barracks", "Build a Barracks", "other", { pre: "Send 1 villager from Hunt" })] },
+    M("Feudal Age", "feudal"),
+    { g: "18–30", from: 19, to: 30, items: [
+      I("Farms", "Send your new Villagers to build Farms next to your Town Center or Mills", "food", { pre: "Continue until you have 15 farms" }),
+      I("Stable", "Build a Stable", "other", { pre: "Take 2 villagers (1 from Barracks)" }),
+      I("Double-Bit Axe", "Research Double-Bit Axe in a Lumber Camp", "wood"),
+      I("Horse Collar", "Research in your Mill", "food", { pre: "If on closed map..." }),
+      I("Wall", "Wall your base", "other", { pre: "With 2 villagers from Stable" }),
+      I("Scouts / Steppe Lancers", "Make 5 scouts / Steppe lancers", "other"),
+      I("Spearmen", "Make 1–4 spears for defence", "other", { pre: "Optional" }),
+      I("Bloodlines", "Research Bloodlines", "other")] },
+    { g: "30–35", from: 31, to: 35, items: [
+      I("(Gold) Mining Camp", "Send 5 Villagers to build a Mining Camp next to your Gold", "gold", { then: "When finished, send them to Gold" }),
+      I("Berries", "Redistribute from Berries to other resources", "food", { pre: "Once expired..." }),
+      I("Blacksmith", "Build a Blacksmith", "other")] },
+    { g: "35", secs: 160, label: "CASTLE RESEARCH", items: [
+      I("Queue Castle Age", "Queue Castle Age in your Town Center", "other"),
+      I("2 Archery Ranges", "Build 2 Archery Ranges", "other"),
+      I("Fletching", "Research Fletching in your Blacksmith", "other")] },
+    M("Castle Age", "castle"),
+    { g: "35+", open: true, items: [
+      I("Bow Saw", "Research in a Lumber Camp", "wood"),
+      I("Bodkin Arrow", "Research in a Blacksmith", "other"),
+      I("Husbandry", "Research in a Stable", "other"),
+      I("Heavy Plow", "Research Heavy Plow at your Mill", "food"),
+      I("Cavalry Archers", "Start making Cav Archers", "other"),
+      { choice: true, t: "Either", opts: [
+        { t: "Town Center", d: "Build a Town Center" },
+        { t: "Monastery / University / Siege Workshop", d: "Build one of these and get Ballistics" }] },
+      I("Archery Range", "Build an Archery Range", "other"),
+      { choice: true, t: "Add complementary units", opts: [
+        { t: "Hussar", d: "Light cavalry to support your Cav Archers", good: ["archers", "gunpowder", "siege", "infantry", "elephants"], why: "Fast raiders that run down archers, siege and slow units" },
+        { t: "Halberdier", d: "Spear infantry to protect your Cav Archers", good: ["cavalry", "camels"], why: "Counters cavalry and camels" }] },
+      I("Siege", "Add Siege", "other")] }
+  ]
+}];
 
 /* ---------- screens ---------- */
 function screenLogin() {
@@ -303,7 +300,7 @@ async function screenHome() {
   const ico = p => `<svg viewBox="0 0 24 24">${p}</svg>`;
   $app.replaceChildren(
     h("header", {}, CREST(), h("h1", {}, "AoE Companion"), h("p", {}, "Age of Empires II"),
-      h("div", { class: "ages" }, ["Dark","Feudal","Castle","Imperial"].map((a, i) => h("span", { class: "age" + (i === 3 ? " on" : "") }, a)))),
+      h("div", { class: "ages" }, ["Dark", "Feudal", "Castle", "Imperial"].map((a, i) => h("span", { class: "age" + (i === 3 ? " on" : "") }, a)))),
     h("main", {},
       tile("t-build", "Build Orders", count, ico('<path d="M6 3h10a3 3 0 0 1 3 3v12a3 3 0 0 0 3 3H8a3 3 0 0 1-3-3V4"/><path d="M9 8h7M9 12h7M9 16h4"/>'), () => location.hash = "#/builds"),
       tile("t-stats", "My Stats", h("span", {}, "Coming in step 4"), ico('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>')),
@@ -317,30 +314,42 @@ async function screenHome() {
   count.textContent = n ? n + " saved" : "Load your starter builds";
 }
 
+async function reloadSeeds() {
+  const del = await sb.from("aoe_build_orders").delete().eq("source", "seed");
+  if (del.error) return del.error.message;
+  const rows = SEEDS.map(s => ({ title: s.title, strategy: s.strategy, overview: s.overview, steps: s.steps, source: "seed" }));
+  const ins = await sb.from("aoe_build_orders").insert(rows);
+  return ins.error ? ins.error.message : null;
+}
+
 async function screenBuilds() {
   stopTimer();
   const list = h("div", {}, h("div", { class: "small" }, "Loading..."));
   $app.replaceChildren(
     h("header", { class: "slim" }, h("button", { class: "back", onclick: () => location.hash = "#/" }, "‹ Home"), h("h1", {}, "Build Orders")),
     h("main", {}, list));
-  const { data, error } = await sb.from("aoe_build_orders").select("id,title,strategy,civ,steps,source").order("created_at");
+  let { data, error } = await sb.from("aoe_build_orders").select("id,title,strategy,civ,steps,source").order("created_at");
   if (error) { list.replaceChildren(h("div", { class: "msg" }, error.message)); return; }
+  // older starter builds used a previous step format: replace them automatically
+  if (data.some(b => b.source === "seed" && (b.steps || []).some(s => !s.g && !s.m))) {
+    const err = await reloadSeeds();
+    if (err) { list.replaceChildren(h("div", { class: "msg" }, err)); return; }
+    ({ data } = await sb.from("aoe_build_orders").select("id,title,strategy,civ,steps,source").order("created_at"));
+  }
   list.replaceChildren();
   if (!data.length) {
     list.append(h("div", { class: "small", style: "margin:0 0 14px" }, "No builds yet. Load the starter set to get going."),
-      h("button", { class: "primary", onclick: async () => {
-        const rows = SEEDS.map(s => ({ title: s.title, strategy: s.strategy, overview: s.overview, steps: s.steps, source: "seed" }));
-        const { error: e } = await sb.from("aoe_build_orders").insert(rows);
-        if (e) alert(e.message); else screenBuilds();
-      } }, "LOAD STARTER BUILDS"));
+      h("button", { class: "primary", onclick: async () => { const e = await reloadSeeds(); if (e) alert(e); else screenBuilds(); } }, "LOAD STARTER BUILDS"));
     return;
   }
   data.forEach(b => {
-    const vils = (b.steps || []).reduce((a, s) => a + (s.v && !s.mv ? s.v : 0), 0);
+    const pops = (b.steps || []).filter(s => s.to).map(s => s.to);
+    const maxPop = pops.length ? Math.max(...pops) : null;
     list.append(h("button", { class: "bcard", onclick: () => location.hash = "#/build/" + b.id },
       h("b", {}, b.title),
-      h("span", {}, b.strategy ? h("span", { class: "tag" }, b.strategy) : null, b.civ ? h("span", { class: "tag" }, b.civ) : null, (vils + 3) + " pop · " + (b.steps || []).length + " steps")));
+      h("span", {}, b.strategy ? h("span", { class: "tag" }, b.strategy) : null, b.civ ? h("span", { class: "tag" }, b.civ) : null, maxPop ? "to " + maxPop + " villagers" : "")));
   });
+  list.append(h("button", { class: "ghost", onclick: async () => { if (confirm("Replace the starter builds with the latest versions? Builds you made yourself are not touched.")) { const e = await reloadSeeds(); if (e) alert(e); else screenBuilds(); } } }, "Reload starter builds"));
 }
 
 async function screenBuild(id) {
@@ -348,31 +357,86 @@ async function screenBuild(id) {
   const { data: b, error } = await sb.from("aoe_build_orders").select("*").eq("id", id).maybeSingle();
   if (error || !b) { location.hash = "#/builds"; return; }
 
-  // timeline: every villager takes 25s; multi-villager steps wait for the full time
-  let t = 0, pop = 3;
+  /* timeline: each villager takes 25s; a group of villagers lasts for all of them */
+  let t = 0;
   const tl = (b.steps || []).map(s => {
-    const real = s.v && !s.mv;
-    const dur = real ? s.v * VIL_SECS : 0;
-    const o = { ...s, start: t, dur };
-    if (real) pop += s.v;
-    o.pop = pop; t += dur; return o;
+    let dur = 0;
+    if (s.g) dur = s.secs != null ? s.secs : (s.from ? (s.to - s.from + 1) * VIL_SECS : 0);
+    const o = { ...s, start: t, dur }; t += dur; return o;
   });
   const total = t;
+  const timed = tl.map((s, i) => (s.dur > 0 || s.open) ? i : -1).filter(i => i >= 0);
+  const hasOpen = tl.some(s => s.open);
+  const linked = i => timed.find(j => j > i);
 
+  /* matchup (enemy civs / army tags) */
+  let enemy = store.get("enemy", { civs: [], tags: [] });
+  const enemyTags = () => { const set = new Set(enemy.tags); enemy.civs.forEach(c => (CIV_TAGS[c] || []).forEach(x => set.add(x))); return [...set]; };
+  const choices = [];
+
+  const itemEl = it => {
+    if (it.choice) {
+      const box = h("div", { class: "it" }, h("div", { class: "pre" }, it.t));
+      const wrap = h("div", { class: "opts" });
+      const optEls = it.opts.map((o, k) => {
+        const why = h("div", { class: "why" });
+        const el = h("div", { class: "opt" }, h("div", { class: "ttl" }, o.t), o.d ? h("div", { class: "note" }, o.d) : null, why);
+        wrap.append(el); if (k < it.opts.length - 1 && !o.good) wrap.append(h("div", { class: "or" }, "OR"));
+        return { o, el, why };
+      });
+      box.append(wrap);
+      if (it.opts.some(o => o.good)) choices.push(optEls);
+      return box;
+    }
+    return h("div", { class: "it r-" + (it.r || "other") + (it.side ? " side" : "") },
+      it.pre ? h("div", { class: "pre" }, it.pre) : null,
+      h("div", { class: "ttl" }, h("i", { class: "dot" }), it.t, it.side ? h("span", { class: "alsotag" }, "also") : null),
+      it.d ? h("div", { class: "note" }, it.d) : null,
+      it.then ? h("div", { class: "then" }, it.then) : null);
+  };
+
+  const BADGE = { dark: "I", feudal: "II", castle: "III", imperial: "IV" };
   const rows = tl.map((s, i) => {
-    if (s.m) return h("div", { class: "row mile" + (s.age ? " age-" + s.age : ""), "data-i": i },
-      h("div", {}, h("div", { class: "ttl" }, s.m), s.n ? h("div", { class: "note" }, s.n) : null));
-    return h("div", { class: "row step r-" + (s.r || "other"), "data-i": i, onclick: () => seek(s.start) },
-      h("div", { class: "pop" }, s.mv ? "↻" : "→ " + s.pop, h("small", {}, s.mv ? "MOVE" : "POP")),
-      h("div", {}, h("div", { class: "ttl" }, h("i", { class: "dot" }), (s.mv ? "" : s.v + "× ") + s.t), s.n ? h("div", { class: "note" }, s.n) : null),
+    if (s.m) return h("div", { class: "row mile" }, h("div", { class: "ttl", "data-badge": BADGE[s.age] || "•" }, s.m));
+    return h("div", { class: "row grp" },
+      h("div", { class: "pop" }, s.g, h("small", {}, s.label || "VILLAGERS")),
+      h("div", {}, s.items.map(itemEl)),
       h("div", { class: "secs" }, s.dur ? fmt(s.dur) : ""),
       h("div", { class: "bar" }));
   });
 
-  const stepsEl = h("div", { class: "steps" + (pref.get("compact", false) ? " compact" : "") }, rows);
+  function updateChoices() {
+    const tags = enemyTags();
+    facing.textContent = tags.length ? "Facing: " + tags.join(", ") + (enemy.civs.length ? " (" + enemy.civs.join(", ") + ")" : "") : "Add an enemy civ or army type to get Castle Age advice.";
+    choices.forEach(opts => {
+      const scored = opts.map(x => ({ ...x, hit: (x.o.good || []).filter(g => tags.includes(g)) }));
+      const max = Math.max(0, ...scored.map(x => x.hit.length));
+      scored.forEach(x => {
+        const best = max > 0 && x.hit.length === max;
+        x.el.classList.toggle("best", best);
+        x.el.classList.toggle("dim", max > 0 && !best);
+        x.why.textContent = best ? x.o.why + " · enemy has: " + x.hit.join(", ") : "";
+      });
+    });
+  }
+  const saveEnemy = () => { store.set("enemy", enemy); drawChips(); updateChoices(); };
+
+  const facing = h("div", { class: "facing" });
+  const chipBox = h("div", { class: "chips" });
+  const civSel = h("select", {}, h("option", { value: "" }, "Add enemy civ..."), Object.keys(CIV_TAGS).map(c => h("option", { value: c }, c)));
+  const drawChips = () => {
+    chipBox.replaceChildren(
+      ...enemy.civs.map(c => h("button", { class: "chip civ on", onclick: () => { enemy.civs = enemy.civs.filter(x => x !== c); saveEnemy(); } }, c)),
+      ...TAGS.map(g => h("button", { class: "chip" + (enemy.tags.includes(g) ? " on" : ""), onclick: () => { enemy.tags = enemy.tags.includes(g) ? enemy.tags.filter(x => x !== g) : [...enemy.tags, g]; saveEnemy(); } }, g)));
+  };
+  const matchup = h("details", { class: "sec", open: "" }, h("summary", {}, "Matchup"),
+    h("div", { class: "addrow" }, civSel, h("button", { onclick: () => { if (civSel.value && !enemy.civs.includes(civSel.value)) { enemy.civs.push(civSel.value); saveEnemy(); } civSel.value = ""; } }, "Add")),
+    chipBox, facing);
+
+  const stepsEl = h("div", { class: "steps" + (store.get("compact", false) ? " compact" : "") }, rows);
   const toggle = (key, label, def, onchange) => {
-    const cb = h("input", { type: "checkbox" }); cb.checked = pref.get(key, def);
-    cb.onchange = () => { pref.set(key, cb.checked); onchange && onchange(cb.checked); };
+    const cb = h("input", { type: "checkbox" }); cb.checked = store.get(key, def);
+    cb.onchange = () => { store.set(key, cb.checked); onchange && onchange(cb.checked); };
     return h("label", { class: "tog" }, cb, label);
   };
   const sec = (title, text) => text ? h("details", { class: "sec", open: title === "Build Overview" ? "" : null }, h("summary", {}, title), h("p", {}, text)) : null;
@@ -383,48 +447,61 @@ async function screenBuild(id) {
     h("button", { onclick: () => stepBy(-1), "aria-label": "Previous step" }, "‹"),
     goBtn, timeEl,
     h("button", { onclick: () => stepBy(1), "aria-label": "Next step" }, "›"),
-    h("button", { onclick: reset, "aria-label": "Reset" }, "⟲"));
+    h("button", { onclick: () => reset(), "aria-label": "Reset" }, "⟲"));
 
   $app.replaceChildren(
     h("header", { class: "slim" }, h("button", { class: "back", onclick: () => location.hash = "#/builds" }, "‹ Build Orders"),
       h("h1", {}, b.title), h("p", {}, "Build Guide" + (b.civ ? " · " + b.civ : ""))),
     h("main", {},
       sec("Build Overview", b.overview), sec("Pros & Cons", [b.pros, b.cons].filter(Boolean).join("\n\n")), sec("Tips", b.tips),
+      matchup,
       h("div", { class: "toggles" },
         toggle("compact", "Use compact/simplified mode", false, on => stepsEl.classList.toggle("compact", on)),
         toggle("autoscroll", "Enable autoscroll", true)),
       stepsEl),
     dock);
+  drawChips(); updateChoices();
 
-  // ---- timer ----
+  /* ---- timer ---- */
   let elapsed = 0, running = false, last = 0, curIdx = -1;
-  const realIdx = tl.map((s, i) => s.dur ? i : -1).filter(i => i >= 0);
+  function currentIdx() {
+    if (!timed.length) return -1;
+    const hit = timed.find(i => !tl[i].open && elapsed >= tl[i].start && elapsed < tl[i].start + tl[i].dur);
+    if (hit !== undefined) return hit;
+    if (elapsed >= total) return timed[timed.length - 1];
+    return timed[0];
+  }
   function paint() {
     timeEl.textContent = fmt(elapsed);
-    let cur = realIdx.find(i => elapsed >= tl[i].start && elapsed < tl[i].start + tl[i].dur);
-    if (cur === undefined) cur = elapsed >= total && total > 0 ? realIdx[realIdx.length - 1] : realIdx[0];
+    const cur = currentIdx();
+    const started = running || elapsed > 0;
     rows.forEach((r, i) => {
-      const s = tl[i]; const finished = s.dur ? elapsed >= s.start + s.dur : (elapsed > s.start && elapsed >= (nextRealStart(i)));
-      r.classList.toggle("done", !!finished && i !== cur || (elapsed >= total && total > 0));
-      r.classList.toggle("cur", i === cur && (running || elapsed > 0) && elapsed < total);
-      const bar = r.querySelector(".bar"); if (bar) bar.style.width = i === cur && s.dur ? Math.min(100, ((elapsed - s.start) / s.dur) * 100) + "%" : (finished ? "100%" : "0");
+      const s = tl[i]; let done = false, isCur = false, pct = 0;
+      if (s.m) { const n = linked(i); done = n !== undefined && elapsed >= tl[n].start && started && elapsed > 0; }
+      else if (timed.includes(i)) {
+        if (s.open) { isCur = started && elapsed >= s.start; }
+        else { done = elapsed >= s.start + s.dur; isCur = started && i === cur && !done; pct = isCur ? ((elapsed - s.start) / s.dur) * 100 : (done ? 100 : 0); }
+      } else { const n = linked(i); if (n !== undefined) { done = elapsed >= tl[n].start + tl[n].dur && !tl[n].open; isCur = started && n === cur && !done; } }
+      r.classList.toggle("done", done && !isCur);
+      r.classList.toggle("cur", isCur);
+      const bar = r.querySelector(".bar"); if (bar) bar.style.width = Math.min(100, pct) + "%";
     });
     if (cur !== curIdx) {
       curIdx = cur;
-      if ((running || elapsed > 0) && pref.get("autoscroll", true)) rows[cur].scrollIntoView({ behavior: "smooth", block: "center" });
+      if (started && cur >= 0 && store.get("autoscroll", true)) rows[cur].scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }
-  function nextRealStart(i) { const n = realIdx.find(j => j > i); return n === undefined ? total : tl[n].start; }
-  function tick() { const now = Date.now(); elapsed += (now - last) / 1000; last = now; if (elapsed >= total) { elapsed = total; pause(); } paint(); }
-  function start() { if (elapsed >= total) elapsed = 0; running = true; last = Date.now(); goBtn.textContent = "PAUSE"; timer = setInterval(tick, 250); holdWake(); paint(); }
-  function pause() { running = false; goBtn.textContent = elapsed >= total && total ? "DONE" : "START"; stopTimer(); paint(); }
-  function reset() { pause(); elapsed = 0; curIdx = -1; goBtn.textContent = "START"; paint(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  function tick() { const now = Date.now(); elapsed += (now - last) / 1000; last = now; if (!hasOpen && elapsed >= total) { elapsed = total; pause(); return; } paint(); }
+  function start() { if (!hasOpen && elapsed >= total) elapsed = 0; running = true; last = Date.now(); goBtn.textContent = "PAUSE"; timer = setInterval(tick, 250); holdWake(); paint(); }
+  function pause() { running = false; goBtn.textContent = "START"; stopTimer(); paint(); }
+  function reset() { pause(); elapsed = 0; curIdx = -1; paint(); window.scrollTo({ top: 0, behavior: "smooth" }); }
   function seek(sec) { elapsed = sec; last = Date.now(); curIdx = -1; paint(); }
   function stepBy(d) {
-    const idx = realIdx.findIndex(i => elapsed >= tl[i].start && elapsed < tl[i].start + tl[i].dur);
-    const to = Math.min(realIdx.length - 1, Math.max(0, (idx < 0 ? 0 : idx) + d));
-    seek(tl[realIdx[to]].start);
+    const here = timed.findIndex(i => !tl[i].open ? (elapsed >= tl[i].start && elapsed < tl[i].start + tl[i].dur) : elapsed >= tl[i].start);
+    const to = Math.min(timed.length - 1, Math.max(0, (here < 0 ? 0 : here) + d));
+    seek(tl[timed[to]].start);
   }
+  rows.forEach((r, i) => { if (timed.includes(i)) r.addEventListener("click", e => { if (!e.target.closest(".opt")) seek(tl[i].start); }); });
   goBtn.onclick = () => running ? pause() : start();
   paint();
 }
