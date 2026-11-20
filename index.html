@@ -222,7 +222,7 @@ const SUPABASE_URL  = "https://wupafyrlpzxbvhpvpfvg.supabase.co";
 const SUPABASE_ANON = "sb_publishable_3O7138aIMet40AwenYXGNQ_5hPBZewU";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-const APP_VERSION = "v4.3";
+const APP_VERSION = "v4.4";
 const VIL_SECS = 25;   // seconds to make one villager
 const $app = document.getElementById("app");
 let user = null, timer = null, wake = null;
@@ -1021,15 +1021,17 @@ async function screenBuild(id) {
 
 /* ---------- stats ---------- */
 const API_URL = pid => "https://aoe-api.worldsedgelink.com/community/leaderboard/getRecentMatchHistory?title=age2&profile_ids=" + encodeURIComponent("[" + pid + "]");
-const CIV_NAMES = ["Aztecs","Berbers","Britons","Bulgarians","Burmese","Byzantines","Celts","Chinese","Cumans","Ethiopians","Franks","Goths","Huns","Incas","Hindustanis","Italians","Japanese","Khmer","Koreans","Lithuanians","Magyars","Malay","Malians","Mayans","Mongols","Persians","Portuguese","Saracens","Slavs","Spanish","Tatars","Teutons","Turks","Vietnamese","Vikings","Burgundians","Sicilians","Poles","Bohemians","Bengalis","Dravidians","Gurjaras"];
+const CIV_NAMES = ["Aztecs","Berbers","Britons","Bulgarians","Burmese","Byzantines","Celts","Chinese","Cumans","Ethiopians","Franks","Goths","Huns","Incas","Hindustanis","Italians","Japanese","Khmer","Koreans","Lithuanians","Magyars","Malay","Malians","Mayans","Mongols","Persians","Portuguese","Romans","Saracens","Slavs","Spanish","Tatars","Teutons","Turks","Vietnamese","Vikings","Burgundians","Sicilians","Poles","Bohemians","Bengalis","Dravidians","Gurjaras"];
 const MATCH_TYPES = { 2:"1v1 Death Match",3:"2v2 Death Match",4:"3v3 Death Match",5:"4v4 Death Match",6:"1v1 Random Map",7:"2v2 Random Map",8:"3v3 Random Map",9:"4v4 Random Map",10:"Battle Royale",26:"1v1 Empire Wars",27:"2v2 Empire Wars",28:"3v3 Empire Wars",29:"4v4 Empire Wars",60:"Custom DM 1v1",61:"Custom DM Team" };
 const MODE_FILTERS = [["all","All"],["1v1","1v1 Random Map"],["team","Team Random Map"],["other","Other"]];
 const modeOf = mt => mt === 6 ? "1v1" : (mt === 7 || mt === 8 || mt === 9) ? "team" : "other";
 const civOverrides = () => store.get("civ_names", {});
 const civName = id => id == null ? "?" : (civOverrides()[id] || CIV_NAMES[id] || ("Civ #" + id));
-const MAP_FIX = { nomad:"Nomad", megarandom:"Mega Random", goldenpit:"Golden Pit", goldenswamp:"Golden Swamp", africanclearing:"African Clearing", fourlakes:"Four Lakes", blackforest:"Black Forest", ghostlake:"Ghost Lake", nildelta:"Nile Delta", nile:"Nile Delta", frigidlake:"Frigid Lake", baltic:"Baltic", arabia:"Arabia", arena:"Arena", islands:"Islands", yucatan:"Yucatan", fortress:"Fortress", mediterranean:"Mediterranean", michi:"Michi", kilimanjaro:"Kilimanjaro", valley:"Valley", acropolis:"Acropolis", serengeti:"Serengeti", highland:"Highland", mountain:"Mountain Pass", steppe:"Steppe", wetlands:"Wetlands" };
+const MAP_FIX = { nomad:"Nomad", megarandom:"Mega Random", goldenpit:"Golden Pit", goldenswamp:"Golden Swamp", africanclearing:"African Clearing", fourlakes:"Four Lakes", blackforest:"Black Forest", ghostlake:"Ghost Lake", nildelta:"Nile Delta", arabia:"Arabia", arena:"Arena", islands:"Islands", yucatan:"Yucatan", fortress:"Fortress", mediterranean:"Mediterranean", michi:"Michi", kilimanjaro:"Kilimanjaro", valley:"Valley", acropolis:"Acropolis", serengeti:"Serengeti" };
+const mapOverrides = () => store.get("map_names", {});
 const mapName = f => {
   if (!f) return "Unknown";
+  if (mapOverrides()[f]) return mapOverrides()[f];
   let n = String(f).replace(/\.(rms2?|scx|scn)$/i, "").replace(/^(rm|aoe2|ranked|map)[_-]/i, "");
   const key = n.toLowerCase().replace(/[^a-z]/g, "");
   if (MAP_FIX[key]) return MAP_FIX[key];
@@ -1128,14 +1130,28 @@ async function screenStats() {
     return h("div", { class: "spark" }, h("div", { class: "small" }, "Rating: " + lo + " – " + hi + " (last " + pts.length + " games)"),
       h("div", { innerHTML: `<svg viewBox="0 0 ${W} ${H}" width="100%"><polyline points="${d}" fill="none" stroke="#e0b04a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/></svg>` }));
   };
-  const unknownCivs = () => {
-    const ids = [...new Set(all.map(r => r.raw && r.raw.race_id).filter(id => id != null && !CIV_NAMES[id] && !civOverrides()[id]))];
-    if (!ids.length) return null;
-    return h("details", { class: "sec" }, h("summary", {}, "Name unknown civs (" + ids.length + ")"),
-      h("div", { class: "sbody" }, h("div", { class: "small" }, "New civs get new ID numbers. Type each name once and it's remembered on this device."),
-        ids.map(id => h("div", { class: "addrow" }, h("input", { placeholder: "Civ #" + id, onchange: e => { const o = civOverrides(); o[id] = e.target.value.trim(); store.set("civ_names", o); paint(); } })))));
+  let fixOpen = false;
+  const fixPanel = () => {
+    const civs = {}, maps = {};
+    for (const r of all) {
+      const raw = r.raw || {};
+      if (raw.mapfile) { maps[raw.mapfile] = (maps[raw.mapfile] || 0) + 1; }
+      const ids = new Set([raw.race_id, ...((raw.players || []).map(x => x.civ))].filter(x => x != null));
+      for (const id of ids) civs[id] = (civs[id] || 0) + 1;
+    }
+    const unknown = Object.keys(civs).filter(id => !CIV_NAMES[id] && !civOverrides()[id]).length;
+    const line = (label, ph, key, mapObj, saveKey) => h("div", { class: "addrow" },
+      h("span", { class: "small", style: "min-width:150px;align-self:center" }, label),
+      h("input", { placeholder: ph, value: (store.get(saveKey, {})[key]) || "", onchange: e => { const o = store.get(saveKey, {}); if (e.target.value.trim()) o[key] = e.target.value.trim(); else delete o[key]; store.set(saveKey, o); paint(); } }));
+    return h("details", Object.assign({ class: "sec", ontoggle: e => { fixOpen = e.target.open; } }, fixOpen ? { open: "" } : {}),
+      h("summary", {}, "Fix civ & map names" + (unknown ? " (" + unknown + " civs unknown)" : "")),
+      h("div", { class: "sbody" },
+        h("div", { class: "small" }, "Type the right name to override. Saved on this device. Leave blank to use the automatic name."),
+        h("b", { style: "display:block;margin:10px 0 4px" }, "Civilizations"),
+        Object.keys(civs).sort((a, b) => civs[b] - civs[a]).map(id => line("#" + id + " now: " + civName(Number(id)) + " (" + civs[id] + ")", civName(Number(id)), id, civs, "civ_names")),
+        h("b", { style: "display:block;margin:10px 0 4px" }, "Maps"),
+        Object.keys(maps).sort((a, b) => maps[b] - maps[a]).map(f => line(f + " now: " + mapName(f) + " (" + maps[f] + ")", mapName(f), f, maps, "map_names"))));
   };
-
   const playersLine = r => {
     const pl = (r.raw && r.raw.players) || [];
     if (!pl.length) return null;
@@ -1169,7 +1185,7 @@ async function screenStats() {
             playersLine(r),
             h("span", { class: "small" }, (r.played_at ? new Date(r.played_at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "") + (diff != null ? " · " + (diff > 0 ? "+" : "") + diff + " rating" : "")));
         }))),
-      unknownCivs(),
+      fixPanel(),
       lastFirst ? h("details", { class: "sec" }, h("summary", {}, "Debug: raw first game"), h("pre", { style: "white-space:pre-wrap;word-break:break-all;font-size:11px;color:var(--other)" }, lastFirst)) : null,
       h("button", { class: "primary", style: "margin-top:14px", onclick: refresh }, "REFRESH FROM GAME API"));
   }
