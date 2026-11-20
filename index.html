@@ -3,59 +3,151 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#c8472f">
+<meta name="theme-color" content="#a53a26">
 <title>AoE Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root { --brick:#c8472f; --brick-dark:#a53a26; --bg:#1b1a19; --card:#262422; --line:#3a3734; --text:#f2ece4; --muted:#a89f94; }
+  :root {
+    --brick:#c8472f; --brick-dark:#8f2f1e; --gold:#e0b04a; --gold-soft:#f1d58b;
+    --bg:#1f1814; --bg2:#2a201a; --card:#33271f; --card2:#3d2e24; --line:#5a4333;
+    --text:#f6ecdc; --muted:#b9a58c;
+    --food:#d65a4a; --wood:#6f9a4e; --gold-res:#e0b04a; --stone:#8d98a6;
+    --head:"Cinzel", Georgia, "Times New Roman", serif;
+    --body:"Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  body { margin:0; background:var(--bg); color:var(--text); font:17px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
-  header { background:var(--brick); padding:28px 20px 22px; padding-top:calc(28px + env(safe-area-inset-top)); }
-  header h1 { margin:0; font-size:30px; }
-  header p { margin:4px 0 0; opacity:.9; }
-  main { padding:18px; max-width:560px; margin:0 auto; }
-  .tile { display:block; width:100%; text-align:left; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:12px; color:var(--text); font:inherit; cursor:pointer; }
-  .tile b { display:block; font-size:20px; margin-bottom:2px; }
-  .tile span { color:var(--muted); font-size:15px; }
-  .tile[disabled] { opacity:.5; cursor:default; }
-  .tile:not([disabled]):active { background:#2f2c29; }
-  input { width:100%; padding:14px; margin-bottom:12px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--text); font:inherit; }
-  button.primary { width:100%; padding:14px; border:0; border-radius:10px; background:var(--brick); color:#fff; font:inherit; font-weight:600; cursor:pointer; }
+  html { background:var(--bg); }
+  body {
+    margin:0; min-height:100vh; color:var(--text); font:17px/1.45 var(--body);
+    background:
+      radial-gradient(900px 420px at 50% -80px, rgba(224,176,74,.16), transparent 70%),
+      radial-gradient(600px 400px at 100% 100%, rgba(200,71,47,.10), transparent 70%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 2px, transparent 2px 6px),
+      linear-gradient(180deg, var(--bg2), var(--bg) 60%);
+  }
+
+  /* ---------- header: brick banner with hanging pennants ---------- */
+  header {
+    position:relative; text-align:center;
+    padding:26px 20px 30px; padding-top:calc(26px + env(safe-area-inset-top));
+    background:
+      radial-gradient(500px 160px at 50% 0, rgba(255,214,140,.22), transparent 70%),
+      linear-gradient(180deg, #d4503a, var(--brick-dark));
+    border-bottom:3px solid var(--gold);
+    box-shadow:0 8px 24px rgba(0,0,0,.45);
+  }
+  header::after { /* pennant fringe */
+    content:""; position:absolute; left:0; right:0; bottom:-17px; height:14px;
+    background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='14'><polygon points='0,0 28,0 14,14' fill='%23e0b04a'/><polygon points='3,0 25,0 14,11' fill='%238f2f1e'/></svg>") repeat-x;
+  }
+  .crest { width:64px; height:72px; margin:0 auto 6px; filter:drop-shadow(0 3px 4px rgba(0,0,0,.45)); }
+  header h1 { margin:0; font:700 28px/1.1 var(--head); letter-spacing:.06em; text-shadow:0 2px 0 rgba(0,0,0,.35); }
+  header p { margin:6px 0 0; color:var(--gold-soft); font-size:15px; }
+
+  /* ---------- the four ages ---------- */
+  .ages { display:flex; justify-content:center; gap:8px; margin:14px 0 0; }
+  .age { font:600 12px var(--head); letter-spacing:.04em; padding:3px 10px; border-radius:999px;
+         border:1px solid rgba(255,255,255,.35); color:rgba(255,255,255,.75); background:rgba(0,0,0,.18); }
+  .age.on { background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#3b2410; border-color:var(--gold-soft); }
+
+  main { padding:34px 18px 24px; max-width:560px; margin:0 auto; }
+
+  /* ---------- tiles ---------- */
+  .tile {
+    position:relative; display:flex; align-items:center; gap:16px; width:100%; text-align:left;
+    padding:18px 18px 18px 22px; margin-bottom:14px; color:var(--text); font:inherit; cursor:pointer;
+    background:linear-gradient(180deg, var(--card2), var(--card));
+    border:1px solid var(--line); border-radius:14px; overflow:hidden;
+    box-shadow:0 4px 12px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .tile::before { content:""; position:absolute; left:0; top:0; bottom:0; width:6px; background:var(--accent); }
+  .tile .ico { flex:0 0 50px; height:50px; border-radius:50%; display:grid; place-items:center;
+               background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.18), rgba(0,0,0,.25));
+               border:2px solid var(--accent); color:var(--accent); }
+  .tile .ico svg { width:26px; height:26px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .tile b { display:block; font:700 19px var(--head); letter-spacing:.03em; }
+  .tile span { color:var(--muted); font-size:14.5px; }
+  .tile[disabled] { opacity:.55; cursor:default; }
+  .tile:not([disabled]):active { transform:translateY(1px); filter:brightness(1.1); }
+  .t-build { --accent:var(--wood); } .t-stats { --accent:var(--gold-res); } .t-gen { --accent:var(--stone); }
+
+  /* ---------- login ---------- */
+  input { width:100%; padding:14px; margin-bottom:12px; border-radius:10px; border:1px solid var(--line);
+          background:#241a14; color:var(--text); font:inherit; }
+  input:focus { outline:2px solid var(--gold); border-color:transparent; }
+  button.primary { width:100%; padding:14px; border:1px solid var(--gold); border-radius:10px; cursor:pointer;
+          background:linear-gradient(180deg, #d4503a, var(--brick-dark)); color:#fff; font:700 16px var(--head); letter-spacing:.08em; }
   .msg { color:#ff9c8a; min-height:1.4em; margin:8px 0; }
-  .small { color:var(--muted); font-size:14px; text-align:center; margin-top:24px; }
-  .small a { color:var(--muted); }
+  .small { color:var(--muted); font-size:14px; text-align:center; margin-top:26px; }
+  .small a { color:var(--gold-soft); }
+  .rule { height:1px; margin:26px auto 0; max-width:220px; background:linear-gradient(90deg, transparent, var(--gold), transparent); }
   .hidden { display:none; }
 </style>
 </head>
 <body>
 
+<!-- Reusable crest: shield with crossed swords (original drawing) -->
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="crest" viewBox="0 0 64 72">
+    <path d="M32 3 L58 12 V36 C58 52 46 63 32 69 C18 63 6 52 6 36 V12 Z" fill="#2a1a12" stroke="#e0b04a" stroke-width="3"/>
+    <path d="M32 3 L58 12 V36 C58 52 46 63 32 69 Z" fill="#c8472f" opacity=".55"/>
+    <g stroke="#f1d58b" stroke-width="3.2" stroke-linecap="round">
+      <line x1="19" y1="20" x2="45" y2="50"/><line x1="45" y1="20" x2="19" y2="50"/>
+    </g>
+    <g stroke="#e0b04a" stroke-width="3.2" stroke-linecap="round">
+      <line x1="15" y1="43" x2="23" y2="37"/><line x1="49" y1="43" x2="41" y2="37"/>
+    </g>
+    <circle cx="32" cy="35" r="5" fill="#e0b04a" stroke="#2a1a12" stroke-width="1.5"/>
+  </symbol>
+</svg>
+
 <!-- ===== SIGN IN ===== -->
 <section id="login" class="hidden">
-  <header><h1>AoE Companion</h1><p>Sign in with your BeerLog login</p></header>
+  <header>
+    <svg class="crest"><use href="#crest"/></svg>
+    <h1>AoE Companion</h1>
+    <p>Sign in with your BeerLog login</p>
+  </header>
   <main>
     <input id="email" type="email" placeholder="Email" autocomplete="username">
     <input id="password" type="password" placeholder="Password" autocomplete="current-password">
-    <button class="primary" id="loginBtn">Sign in</button>
+    <button class="primary" id="loginBtn">ENTER THE KEEP</button>
     <div class="msg" id="loginMsg"></div>
   </main>
 </section>
 
 <!-- ===== HOME ===== -->
 <section id="home" class="hidden">
-  <header><h1>AoE Companion</h1><p id="welcome">Age of Empires II</p></header>
+  <header>
+    <svg class="crest"><use href="#crest"/></svg>
+    <h1>AoE Companion</h1>
+    <p>Age of Empires II</p>
+    <div class="ages"><span class="age">Dark</span><span class="age">Feudal</span><span class="age">Castle</span><span class="age on">Imperial</span></div>
+  </header>
   <main>
-    <button class="tile" disabled><b>Build Orders</b><span id="boCount">Coming in step 2</span></button>
-    <button class="tile" disabled><b>My Stats</b><span>Coming in step 4</span></button>
-    <button class="tile" disabled><b>Generate a Build</b><span>Coming in step 5</span></button>
+    <button class="tile t-build" disabled>
+      <div class="ico"><svg viewBox="0 0 24 24"><path d="M6 3h10a3 3 0 0 1 3 3v12a3 3 0 0 0 3 3H8a3 3 0 0 1-3-3V4"/><path d="M9 8h7M9 12h7M9 16h4"/></svg></div>
+      <div><b>Build Orders</b><span id="boCount">Coming in step 2</span></div>
+    </button>
+    <button class="tile t-stats" disabled>
+      <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div>
+      <div><b>My Stats</b><span>Coming in step 4</span></div>
+    </button>
+    <button class="tile t-gen" disabled>
+      <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l2.2 5.6L20 11l-5.8 2.4L12 19l-2.2-5.6L4 11l5.8-2.4z"/></svg></div>
+      <div><b>Generate a Build</b><span>Coming in step 5</span></div>
+    </button>
+    <div class="rule"></div>
     <div class="small">Profile ID <span id="pid">…</span> · <a href="#" id="logout">Sign out</a></div>
   </main>
 </section>
 
 <script>
-// ====== EDIT THESE TWO LINES (same values as your BeerLog app) ======
 const SUPABASE_URL  = "https://wupafyrlpzxbvhpvpfvg.supabase.co";
 const SUPABASE_ANON = "sb_publishable_3O7138aIMet40AwenYXGNQ_5hPBZewU";
-// =====================================================================
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 const $ = id => document.getElementById(id);
