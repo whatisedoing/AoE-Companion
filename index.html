@@ -1028,9 +1028,14 @@ const civName = id => id == null ? "?" : (civOverrides()[id] || CIV_NAMES[id] ||
 const mapName = f => !f ? "Unknown" : f.replace(/\.rms2?$/i, "").replace(/[_]+/g, " ").replace(/([a-z])([A-Z])/g, "$1 $2").replace(/\b\w/g, c => c.toUpperCase());
 
 async function fetchMatches(pid) {
-  const res = await fetch(API_URL(pid));
-  if (!res.ok) throw new Error("API answered " + res.status);
-  const j = await res.json();
+  let j;
+  const viaProxy = await sb.functions.invoke("aoe-proxy", { body: { pid } });
+  if (!viaProxy.error && viaProxy.data && !viaProxy.data.error) j = viaProxy.data;
+  else {
+    const res = await fetch(API_URL(pid));
+    if (!res.ok) throw new Error("API answered " + res.status);
+    j = await res.json();
+  }
   const rows = [];
   for (const m of j.matchHistoryStats || []) {
     const me = (m.matchhistoryreportresults || []).find(r => r.profile_id === pid);
@@ -1076,7 +1081,7 @@ async function screenStats() {
       status.textContent = "Updated: " + rows.length + " games from the API, " + all.length + " saved in total.";
     } catch (e) {
       status.replaceChildren(h("div", { class: "msg" }, "Couldn't fetch from the game API: " + e.message +
-        (e instanceof TypeError ? " (this usually means the browser blocked it; the fix is a small proxy, tell me and we'll add it)" : "")));
+        (e instanceof TypeError ? " (deploy the aoe-proxy function in Supabase, see the steps)" : "")));
     }
     paint();
   };
