@@ -94,13 +94,17 @@
   <symbol id="crest" viewBox="0 0 64 72">
     <path d="M32 3 L58 12 V36 C58 52 46 63 32 69 C18 63 6 52 6 36 V12 Z" fill="#2a1a12" stroke="#e0b04a" stroke-width="3"/>
     <path d="M32 3 L58 12 V36 C58 52 46 63 32 69 Z" fill="#c8472f" opacity=".55"/>
-    <g stroke="#f1d58b" stroke-width="3.2" stroke-linecap="round">
-      <line x1="19" y1="20" x2="45" y2="50"/><line x1="45" y1="20" x2="19" y2="50"/>
-    </g>
-    <g stroke="#e0b04a" stroke-width="3.2" stroke-linecap="round">
-      <line x1="15" y1="43" x2="23" y2="37"/><line x1="49" y1="43" x2="41" y2="37"/>
-    </g>
-    <circle cx="32" cy="35" r="5" fill="#e0b04a" stroke="#2a1a12" stroke-width="1.5"/>
+    <defs>
+      <g id="sword">
+        <polygon points="0,-25 3,-20 3,6 -3,6 -3,-20" fill="#ece6da" stroke="#2a1a12" stroke-width="1"/>
+        <line x1="0" y1="-21" x2="0" y2="5" stroke="#b9b2a4" stroke-width="1"/>
+        <rect x="-9" y="6" width="18" height="4" rx="1.5" fill="#e0b04a" stroke="#2a1a12" stroke-width="1"/>
+        <rect x="-2.2" y="10" width="4.4" height="9" fill="#7a4a2a" stroke="#2a1a12" stroke-width="1"/>
+        <circle cx="0" cy="21" r="3" fill="#e0b04a" stroke="#2a1a12" stroke-width="1"/>
+      </g>
+    </defs>
+    <use href="#sword" transform="translate(32 36) rotate(-40)"/>
+    <use href="#sword" transform="translate(32 36) rotate(40)"/>
   </symbol>
 </svg>
 
