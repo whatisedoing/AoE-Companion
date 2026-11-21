@@ -223,7 +223,7 @@ const SUPABASE_URL  = "https://wupafyrlpzxbvhpvpfvg.supabase.co";
 const SUPABASE_ANON = "sb_publishable_3O7138aIMet40AwenYXGNQ_5hPBZewU";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-const APP_VERSION = "v4.5";
+const APP_VERSION = "v4.6";
 const VIL_SECS = 25;   // seconds to make one villager
 const $app = document.getElementById("app");
 let user = null, timer = null, wake = null;
@@ -1022,7 +1022,8 @@ async function screenBuild(id) {
 
 /* ---------- stats ---------- */
 const API_URL = pid => "https://aoe-api.worldsedgelink.com/community/leaderboard/getRecentMatchHistory?title=age2&profile_ids=" + encodeURIComponent("[" + pid + "]");
-const CIV_NAMES = ["Aztecs","Berbers","Britons","Bulgarians","Burmese","Byzantines","Celts","Chinese","Cumans","Ethiopians","Franks","Goths","Huns","Incas","Hindustanis","Italians","Japanese","Khmer","Koreans","Lithuanians","Magyars","Malay","Malians","Mayans","Mongols","Persians","Portuguese","Romans","Saracens","Slavs","Spanish","Tatars","Teutons","Turks","Vietnamese","Vikings","Burgundians","Sicilians","Poles","Bohemians","Bengalis","Dravidians","Gurjaras"];
+const CIV_NAMES = ["Armenians","Aztecs","Bengalis","Berbers","Bohemians","Britons","Bulgarians","Burgundians","Burmese","Byzantines","Celts","Chinese","Cumans","Dravidians","Ethiopians","Franks","Georgians","Goths","Gurjaras","Huns","Incas","Hindustanis","Italians","Japanese","Khmer","Koreans","Lithuanians","Magyars","Malay","Malians","Mayans","Mongols","Persians","Poles","Portuguese","Romans","Saracens","Sicilians","Slavs","Spanish","Tatars","Teutons","Turks","Vietnamese","Vikings"];
+CIV_NAMES[59] = "Mapuche"; CIV_NAMES[61] = "Saxons"; CIV_NAMES[62] = "Varangians";
 const MATCH_TYPES = { 2:"1v1 Death Match",3:"2v2 Death Match",4:"3v3 Death Match",5:"4v4 Death Match",6:"1v1 Random Map",7:"2v2 Random Map",8:"3v3 Random Map",9:"4v4 Random Map",10:"Battle Royale",26:"1v1 Empire Wars",27:"2v2 Empire Wars",28:"3v3 Empire Wars",29:"4v4 Empire Wars",60:"Custom DM 1v1",61:"Custom DM Team" };
 const MODE_FILTERS = [["all","All"],["1v1","1v1 Random Map"],["team","Team Random Map"],["other","Other"]];
 const modeOf = mt => mt === 6 ? "1v1" : (mt === 7 || mt === 8 || mt === 9) ? "team" : "other";
@@ -1160,6 +1161,7 @@ async function screenStats() {
       h("summary", {}, "Fix civ & map names" + (unknown ? " (" + unknown + " civs unknown)" : "")),
       h("div", { class: "sbody" },
         h("div", { class: "small" }, "Type the right name to override. Saved on this device. Leave blank to use the automatic name."),
+        h("button", { class: "ghost", onclick: () => { if (confirm("Clear all your typed civ names and use the built-in list?")) { store.set("civ_names", {}); paint(); } } }, "Reset my civ names to the built-in list"),
         h("b", { style: "display:block;margin:10px 0 4px" }, "Civilizations"),
         Object.keys(civs).sort((a, b) => civs[b] - civs[a]).map(id => line("#" + id + " now: " + civName(Number(id)) + " (" + civs[id] + ")", civName(Number(id)), id, civs, "civ_names")),
         h("b", { style: "display:block;margin:10px 0 4px" }, "Maps"),
