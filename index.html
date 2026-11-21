@@ -223,7 +223,7 @@ const SUPABASE_URL  = "https://wupafyrlpzxbvhpvpfvg.supabase.co";
 const SUPABASE_ANON = "sb_publishable_3O7138aIMet40AwenYXGNQ_5hPBZewU";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-const APP_VERSION = "v4.6";
+const APP_VERSION = "v4.8";
 const VIL_SECS = 25;   // seconds to make one villager
 const $app = document.getElementById("app");
 let user = null, timer = null, wake = null;
@@ -567,7 +567,7 @@ async function screenHome() {
       h("div", { class: "ages" }, ["Dark", "Feudal", "Castle", "Imperial"].map((a, i) => h("span", { class: "age" + (i === 3 ? " on" : "") }, a)))),
     h("main", {},
       tile("t-build", "Build Orders", count, ico('<path d="M6 3h10a3 3 0 0 1 3 3v12a3 3 0 0 0 3 3H8a3 3 0 0 1-3-3V4"/><path d="M9 8h7M9 12h7M9 16h4"/>'), () => location.hash = "#/builds"),
-      tile("t-stats", "My Stats", h("span", {}, "Rating, civs, maps, recent games"), ico('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'), () => location.hash = "#/stats"),
+      tile("t-stats", "My Stats", h("span", {}, "Opens your aoe2insights page"), ico('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'), () => window.open("https://www.aoe2insights.com/user/13135641/", "_blank", "noopener")),
       tile("t-gen", "Generate a Build", h("span", {}, "Coming in step 5"), ico('<path d="M12 3l2.2 5.6L20 11l-5.8 2.4L12 19l-2.2-5.6L4 11l5.8-2.4z"/>')),
       h("div", { class: "rule" }),
       h("div", { class: "small" }, "Profile ID ", pid, " · ", h("a", { href: "#", onclick: async e => { e.preventDefault(); await sb.auth.signOut(); location.reload(); } }, "Sign out")),
@@ -1020,213 +1020,6 @@ async function screenBuild(id) {
   paint();
 }
 
-/* ---------- stats ---------- */
-const API_URL = pid => "https://aoe-api.worldsedgelink.com/community/leaderboard/getRecentMatchHistory?title=age2&profile_ids=" + encodeURIComponent("[" + pid + "]");
-const CIV_NAMES = ["Armenians","Aztecs","Bengalis","Berbers","Bohemians","Britons","Bulgarians","Burgundians","Burmese","Byzantines","Celts","Chinese","Cumans","Dravidians","Ethiopians","Franks","Georgians","Goths","Gurjaras","Huns","Incas","Hindustanis","Italians","Japanese","Khmer","Koreans","Lithuanians","Magyars","Malay","Malians","Mayans","Mongols","Persians","Poles","Portuguese","Romans","Saracens","Sicilians","Slavs","Spanish","Tatars","Teutons","Turks","Vietnamese","Vikings"];
-CIV_NAMES[59] = "Mapuche"; CIV_NAMES[61] = "Saxons"; CIV_NAMES[62] = "Varangians";
-const MATCH_TYPES = { 2:"1v1 Death Match",3:"2v2 Death Match",4:"3v3 Death Match",5:"4v4 Death Match",6:"1v1 Random Map",7:"2v2 Random Map",8:"3v3 Random Map",9:"4v4 Random Map",10:"Battle Royale",26:"1v1 Empire Wars",27:"2v2 Empire Wars",28:"3v3 Empire Wars",29:"4v4 Empire Wars",60:"Custom DM 1v1",61:"Custom DM Team" };
-const MODE_FILTERS = [["all","All"],["1v1","1v1 Random Map"],["team","Team Random Map"],["other","Other"]];
-const modeOf = mt => mt === 6 ? "1v1" : (mt === 7 || mt === 8 || mt === 9) ? "team" : "other";
-const civOverrides = () => store.get("civ_names", {});
-const civName = id => id == null ? "?" : (civOverrides()[id] || CIV_NAMES[id] || ("Civ #" + id));
-const MAP_FIX = { nomad:"Nomad", megarandom:"Mega Random", goldenpit:"Golden Pit", goldenswamp:"Golden Swamp", africanclearing:"African Clearing", fourlakes:"Four Lakes", blackforest:"Black Forest", ghostlake:"Ghost Lake", nildelta:"Nile Delta", arabia:"Arabia", arena:"Arena", islands:"Islands", yucatan:"Yucatan", fortress:"Fortress", mediterranean:"Mediterranean", michi:"Michi", kilimanjaro:"Kilimanjaro", valley:"Valley", acropolis:"Acropolis", serengeti:"Serengeti" };
-const KNOWN_MATCH_MAPS = { 521243334:"Black Forest", 520072500:"African Clearing", 520065747:"Fortified Clearing", 517612733:"Fortified Clearing", 517607080:"Fortified Clearing", 517601304:"African Clearing", 517594693:"African Clearing", 514225609:"Oasis", 514221392:"Hideout" };
-const matchMaps = () => Object.assign({}, KNOWN_MATCH_MAPS, store.get("match_maps", {}));
-const mapOverrides = () => store.get("map_names", {});
-const mapName = f => {
-  if (!f) return "Unknown";
-  if (mapOverrides()[f]) return mapOverrides()[f];
-  let n = String(f).replace(/\.(rms2?|scx|scn)$/i, "").replace(/^(rm|aoe2|ranked|map)[_-]/i, "");
-  const key = n.toLowerCase().replace(/[^a-z]/g, "");
-  if (MAP_FIX[key]) return MAP_FIX[key];
-  return n.replace(/[_-]+/g, " ").replace(/([a-z])([A-Z])/g, "$1 $2").replace(/\b\w/g, c => c.toUpperCase());
-};
-
-let lastApi = "", lastFirst = "";
-async function fetchMatches(pid) {
-  let j;
-  const viaProxy = await sb.functions.invoke("aoe-proxy", { body: { pid } });
-  if (!viaProxy.error && viaProxy.data && viaProxy.data.message && !viaProxy.data.matchHistoryStats) throw new Error("the aoe-proxy function still has Supabase's sample code. Paste in the code from aoe-proxy.ts and Deploy again");
-  if (!viaProxy.error && viaProxy.data && !viaProxy.data.error) j = viaProxy.data;
-  else {
-    const res = await fetch(API_URL(pid));
-    if (!res.ok) throw new Error("API answered " + res.status);
-    j = await res.json();
-  }
-  lastApi = JSON.stringify(j).slice(0, 1800);
-  lastFirst = j.matchHistoryStats && j.matchHistoryStats[0] ? JSON.stringify(j.matchHistoryStats[0]).slice(0, 2500) : "";
-  const names = {};
-  for (const p of j.profiles || []) names[p.profile_id] = p.alias || p.name || ("Player " + p.profile_id);
-  const rows = [];
-  for (const m of j.matchHistoryStats || []) {
-    const results = m.matchhistoryreportresults || [], members = m.matchhistorymember || [];
-    const me = results.find(r => Number(r.profile_id) === Number(pid));
-    if (!me) continue;
-    const memOf = id => members.find(r => Number(r.profile_id) === Number(id)) || {};
-    const civOf = id => { const r = results.find(x => Number(x.profile_id) === Number(id)) || {}; const mm = memOf(id);
-      const v = r.race_id ?? mm.race_id ?? r.civilization_id ?? mm.civilization_id; return v == null ? null : Number(v); };
-    const mem = memOf(pid);
-    const players = results.map(r => ({ pid: r.profile_id, name: names[r.profile_id] || ("Player " + r.profile_id), civ: civOf(r.profile_id), team: r.teamid, won: r.resulttype === 1 }));
-    rows.push({
-      match_id: m.id,
-      played_at: m.startgametime ? new Date(m.startgametime * 1000).toISOString() : null,
-      map: mapName(m.mapname),
-      civ: civName(civOf(pid)),
-      won: me.resulttype === 1,
-      old_rating: mem.oldrating > 0 ? mem.oldrating : null,
-      new_rating: mem.newrating > 0 ? mem.newrating : null,
-      raw: { mt: m.matchtype_id, race_id: civOf(pid), mapfile: m.mapname, secs: (m.completiontime || 0) - (m.startgametime || 0), team: me.teamid, players }
-    });
-  }
-  return rows;
-}
-
-async function screenStats() {
-  stopTimer();
-  let all = [], mode = "all", pid = 21963928;
-  const body = h("div", {}, h("div", { class: "small" }, "Loading..."));
-  const status = h("div", { class: "small" });
-  $app.replaceChildren(
-    h("header", { class: "slim" }, h("button", { class: "back", onclick: () => location.hash = "#/" }, "‹ Home"), h("h1", {}, "My Stats")),
-    h("main", {}, body, status));
-
-  const loadSaved = async () => {
-    const { data, error } = await sb.from("aoe_matches").select("*").order("played_at", { ascending: false }).limit(2000);
-    if (error) throw new Error(error.message);
-    all = data || [];
-  };
-  const refresh = async () => {
-    status.textContent = "Fetching your recent games...";
-    try {
-      const rows = await fetchMatches(pid);
-      if (rows.length) {
-        const up = await sb.from("aoe_matches").upsert(rows, { onConflict: "user_id,match_id" });
-        if (up.error) throw new Error(up.error.message);
-      }
-      await loadSaved();
-      learnMaps();
-      status.replaceChildren("Updated: " + rows.length + " games from the API, " + all.length + " saved in total.",
-        rows.length ? "" : h("details", { class: "sec" }, h("summary", {}, "Show what the API sent back"), h("pre", { style: "white-space:pre-wrap;word-break:break-all;font-size:11px;color:var(--other)" }, lastApi)));
-    } catch (e) {
-      status.replaceChildren(h("div", { class: "msg" }, "Couldn't fetch from the game API: " + e.message +
-        (e instanceof TypeError ? " (deploy the aoe-proxy function in Supabase, see the steps)" : "")));
-    }
-    paint();
-  };
-
-  const rowsFor = () => all.map(r => Object.assign({}, r, { map: matchMaps()[r.match_id] || (r.raw && r.raw.mapfile ? mapName(r.raw.mapfile) : r.map), civ: r.raw && r.raw.race_id != null ? civName(r.raw.race_id) : r.civ, mt: r.raw && r.raw.mt }))
-    .filter(r => mode === "all" || modeOf(r.mt) === mode);
-  const pct = (w, n) => n ? Math.round(100 * w / n) + "%" : "–";
-  const group = (rows, key) => {
-    const g = {};
-    for (const r of rows) { const k = r[key] || "?"; (g[k] = g[k] || { n: 0, w: 0 }); g[k].n++; if (r.won) g[k].w++; }
-    return Object.entries(g).sort((a, b) => b[1].n - a[1].n);
-  };
-  const table = (title, entries) => h("details", { class: "sec", open: "" }, h("summary", {}, title),
-    h("div", { class: "sbody" }, entries.length ? entries.slice(0, 15).map(([k, v]) =>
-      h("div", { class: "srow" }, h("span", { class: "sname" }, k), h("span", { class: "sbar" }, h("i", { style: "width:" + Math.round(100 * v.w / v.n) + "%" })),
-        h("span", { class: "snum" }, pct(v.w, v.n) + " · " + v.w + "-" + (v.n - v.w))))
-      : h("div", { class: "small" }, "No games yet.")));
-  const spark = rows => {
-    const pts = rows.filter(r => r.new_rating).slice().reverse().map(r => r.new_rating);
-    if (pts.length < 2) return null;
-    const lo = Math.min(...pts), hi = Math.max(...pts), W = 300, H = 70, pad = 6;
-    const d = pts.map((v, i) => (pad + i * (W - 2 * pad) / (pts.length - 1)).toFixed(1) + "," + (H - pad - (hi === lo ? 0.5 : (v - lo) / (hi - lo)) * (H - 2 * pad)).toFixed(1)).join(" ");
-    return h("div", { class: "spark" }, h("div", { class: "small" }, "Rating: " + lo + " – " + hi + " (last " + pts.length + " games)"),
-      h("div", { innerHTML: `<svg viewBox="0 0 ${W} ${H}" width="100%"><polyline points="${d}" fill="none" stroke="#e0b04a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/></svg>` }));
-  };
-  const learnMaps = () => {
-    const seen = {};
-    const mm = matchMaps();
-    for (const r of all) { const f = r.raw && r.raw.mapfile; if (f && mm[r.match_id]) (seen[f] = seen[f] || new Set()).add(mm[r.match_id]); }
-    const o = store.get("map_names", {}); let ch = false;
-    for (const [f, names] of Object.entries(seen)) if (names.size === 1 && !o[f]) { o[f] = [...names][0]; ch = true; }
-    if (ch) store.set("map_names", o);
-  };
-  const openGames = new Set();
-  let fixOpen = false;
-  const fixPanel = () => {
-    const civs = {}, maps = {};
-    for (const r of all) {
-      const raw = r.raw || {};
-      if (raw.mapfile) { maps[raw.mapfile] = (maps[raw.mapfile] || 0) + 1; }
-      const ids = new Set([raw.race_id, ...((raw.players || []).map(x => x.civ))].filter(x => x != null));
-      for (const id of ids) civs[id] = (civs[id] || 0) + 1;
-    }
-    const unknown = Object.keys(civs).filter(id => !CIV_NAMES[id] && !civOverrides()[id]).length;
-    const line = (label, ph, key, mapObj, saveKey) => h("div", { class: "addrow" },
-      h("span", { class: "small", style: "min-width:150px;align-self:center" }, label),
-      h("input", { placeholder: ph, value: (store.get(saveKey, {})[key]) || "", onchange: e => { const o = store.get(saveKey, {}); if (e.target.value.trim()) o[key] = e.target.value.trim(); else delete o[key]; store.set(saveKey, o); paint(); } }));
-    return h("details", Object.assign({ class: "sec", ontoggle: e => { fixOpen = e.target.open; } }, fixOpen ? { open: "" } : {}),
-      h("summary", {}, "Fix civ & map names" + (unknown ? " (" + unknown + " civs unknown)" : "")),
-      h("div", { class: "sbody" },
-        h("div", { class: "small" }, "Type the right name to override. Saved on this device. Leave blank to use the automatic name."),
-        h("button", { class: "ghost", onclick: () => { if (confirm("Clear all your typed civ names and use the built-in list?")) { store.set("civ_names", {}); paint(); } } }, "Reset my civ names to the built-in list"),
-        h("b", { style: "display:block;margin:10px 0 4px" }, "Civilizations"),
-        Object.keys(civs).sort((a, b) => civs[b] - civs[a]).map(id => line("#" + id + " now: " + civName(Number(id)) + " (" + civs[id] + ")", civName(Number(id)), id, civs, "civ_names")),
-        h("b", { style: "display:block;margin:10px 0 4px" }, "Maps"),
-        Object.keys(maps).sort((a, b) => maps[b] - maps[a]).map(f => line(f + " now: " + mapName(f) + " (" + maps[f] + ")", mapName(f), f, maps, "map_names"))));
-  };
-  const playersLine = r => {
-    const pl = (r.raw && r.raw.players) || [];
-    if (!pl.length) return null;
-    const lab = x => (x.name || "?") + (x.civ != null ? " (" + civName(x.civ) + ")" : "");
-    const team = r.raw.team;
-    const mates = pl.filter(x => x.team === team && Number(x.pid) !== Number(pid)).map(lab);
-    const foes = pl.filter(x => x.team !== team).map(lab);
-    return h("span", { class: "small" }, (mates.length ? "With " + mates.join(", ") + " · " : "") + "vs " + foes.join(", "));
-  };
-  function paint() {
-    const rows = rowsFor();
-    const wins = rows.filter(r => r.won).length;
-    const rated = rows.filter(r => r.new_rating);
-    let streak = 0;
-    for (const r of rows) { if (r.won === rows[0].won) streak++; else break; }
-    body.replaceChildren(
-      h("div", { style: "display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" },
-        MODE_FILTERS.map(([k, l]) => h("button", { class: "chip" + (mode === k ? " on" : ""), onclick: () => { mode = k; paint(); } }, l))),
-      h("div", { class: "statgrid" },
-        [["Games", rows.length], ["Win rate", pct(wins, rows.length)], ["Rating", rated.length ? rated[0].new_rating : "–"], ["Streak", rows.length ? streak + (rows[0].won ? "W" : "L") : "–"]]
-          .map(([l, v]) => h("div", { class: "stat" }, h("b", {}, String(v)), h("span", {}, l)))),
-      spark(rows),
-      table("By civilization", group(rows, "civ")),
-      table("By map", group(rows, "map")),
-      table("Against civilization", (() => { const g = {}; for (const r of rows) for (const pl of (r.raw && r.raw.players) || []) { if (pl.team === r.raw.team || pl.civ == null) continue; const k = civName(pl.civ); (g[k] = g[k] || { n: 0, w: 0 }); g[k].n++; if (r.won) g[k].w++; } return Object.entries(g).sort((a, b) => b[1].n - a[1].n); })()),
-      h("details", { class: "sec", open: "" }, h("summary", {}, "Recent games"),
-        h("div", { class: "sbody" }, rows.slice(0, 25).map(r => {
-          const diff = r.old_rating && r.new_rating ? r.new_rating - r.old_rating : null;
-          const isOpen = openGames.has(r.match_id);
-          const editor = !isOpen ? null : h("div", { class: "gedit", onclick: e => e.stopPropagation() },
-            h("div", { class: "small" }, "Match #" + r.match_id + (r.raw && r.raw.mapfile ? " · file " + r.raw.mapfile : "")),
-            h("div", { class: "addrow" }, h("span", { class: "small", style: "min-width:60px;align-self:center" }, "Map"),
-              h("input", { value: r.map, onchange: e => { const o = store.get("match_maps", {}); o[r.match_id] = e.target.value.trim(); store.set("match_maps", o); learnMaps(); paint(); } })),
-            ((r.raw && r.raw.players) || []).map(pl => h("div", { class: "addrow" },
-              h("span", { class: "small", style: "min-width:60px;align-self:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" }, Number(pl.pid) === Number(pid) ? "You" : pl.name),
-              h("input", { value: pl.civ != null ? civName(pl.civ) : "", placeholder: "Civ" + (pl.civ != null ? " (id " + pl.civ + ")" : ""), onchange: e => {
-                if (pl.civ == null || !e.target.value.trim()) return;
-                const o = civOverrides(); o[pl.civ] = e.target.value.trim(); store.set("civ_names", o); paint(); } }))),
-            h("div", { class: "small" }, "Editing a civ renames that civ ID everywhere. Editing the map only changes this game (and teaches the file name if it's consistent)."));
-          return h("div", { class: "game " + (r.won ? "win" : "loss"), onclick: () => { if (openGames.has(r.match_id)) openGames.delete(r.match_id); else openGames.add(r.match_id); paint(); } },
-            h("b", {}, (r.won ? "Win" : "Loss") + " · " + r.civ + "  ✎"), h("span", {}, r.map + " · " + (MATCH_TYPES[r.mt] || "Match") + ((r.raw && r.raw.secs > 0) ? " · " + fmt(r.raw.secs) : "")),
-            playersLine(r),
-            h("span", { class: "small" }, (r.played_at ? new Date(r.played_at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "") + (diff != null ? " · " + (diff > 0 ? "+" : "") + diff + " rating" : "")),
-            editor);
-        }))),
-      fixPanel(),
-      lastFirst ? h("details", { class: "sec" }, h("summary", {}, "Debug: raw first game"), h("pre", { style: "white-space:pre-wrap;word-break:break-all;font-size:11px;color:var(--other)" }, lastFirst)) : null,
-      h("button", { class: "primary", style: "margin-top:14px", onclick: refresh }, "REFRESH FROM GAME API"));
-  }
-
-  try {
-    const { data: s } = await sb.from("aoe_settings").select("profile_id").maybeSingle();
-    if (s && s.profile_id) pid = Number(s.profile_id);
-    await loadSaved();
-    learnMaps();
-  } catch (e) { body.replaceChildren(h("div", { class: "msg" }, e.message)); return; }
-  paint();
-  refresh();
-}
-
 /* ---------- router ---------- */
 function route() {
   if (!user) return screenLogin();
@@ -1235,7 +1028,6 @@ function route() {
   if (p.startsWith("build/")) return screenBuild(p.slice(6));
   if (p.startsWith("edit/")) { const [eid, idx] = p.slice(5).split("/"); return screenEdit(eid, idx !== undefined ? Number(idx) : undefined); }
   if (p === "builds") return screenBuilds();
-  if (p === "stats") return screenStats();
   return screenHome();
 }
 window.addEventListener("hashchange", route);
